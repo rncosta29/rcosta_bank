@@ -1,0 +1,36 @@
+# Spring application name
+spring:
+  application:
+    name: server  # Sets the name of the application to "server"
+
+# Server configuration
+server:
+  port: 8761  # Defines the port on which the Spring server will run
+
+# Eureka client configuration
+eureka:
+  client:
+    register-with-eureka: false  # Specifies that the service will not register itself with Eureka
+    fetch-registry: false  # Prevents the client from fetching the registry of other services
+    service-url:
+      defaultZone: http://localhost:8761/eureka  # URL of the Eureka server for service registration and discovery
+
+# Management (Actuator) configuration
+management:
+  endpoint:
+    gateway:
+      enabled: true  # Enables the gateway for management endpoints
+    web:
+      exposure:
+        include: health,metrics,info,prometheus  # Includes or excludes web-exposed management endpoints
+    metrics:
+      enabled: true  # Enables the metrics endpoint
+    prometheus:
+      enabled: true  # Enables the exposure of metrics in Prometheus format
+  prometheus:
+    metrics:
+      export:
+        enabled: true # Enables the export of metrics to Prometheus
+# JAR file name
+jar:
+  name: server  # Sets the JAR file name to "server"
