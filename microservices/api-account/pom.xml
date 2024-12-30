@@ -77,11 +77,6 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>br.com.rcosta</groupId>
-			<artifactId>api-credit</artifactId>
-			<version>0.0.1</version>
-		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
