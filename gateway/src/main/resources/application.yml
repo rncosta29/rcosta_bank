@@ -16,12 +16,12 @@ spring:
 
 # Routes configuration for Spring Cloud Gateway
       routes:
-        - id: api-bank  # ID for the route to the "api-bank" service
-          uri: lb://api-bank  # Specifies the service URL (using load balancing)
+        - id: api-credit  # ID for the route to the "api-credit" service
+          uri: lb://api-credit  # Specifies the service URL (using load balancing)
           predicates:
-            - Path=/api-bank/**  # Defines the path predicate for routing to the "api-bank" service
+            - Path=/api-credit/**  # Defines the path predicate for routing to the "api-credit" service
           filters:
-            - RewritePath=/api-bank(?<segment>/?.*), /${segment}  # Rewrites the path for the route
+            - RewritePath=/api-credit(?<segment>/?.*), /${segment}  # Rewrites the path for the route
 
         - id: api-account  # ID for the route to the "api-account" service
           uri: lb://api-account  # Specifies the service URL (using load balancing)
@@ -71,8 +71,8 @@ springdoc:
     enabled: true  # Enables the Swagger UI for API documentation
     path: /swagger-ui.html  # Path to access the Swagger UI
     urls:
-      - name: api-bank  # Name for the API documentation link for "api-bank"
-        url: API-BANK/swagger-docs  # URL for the Swagger docs of the "api-bank" service
+      - name: api-credit  # Name for the API documentation link for "api-credit"
+        url: API-CREDIT/swagger-docs  # URL for the Swagger docs of the "api-credit" service
       - name: api-account  # Name for the API documentation link for "api-account"
         url: API-ACCOUNT/swagger-docs  # URL for the Swagger docs of the "api-account" service
 
