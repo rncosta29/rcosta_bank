@@ -29,6 +29,7 @@
 	<properties>
 		<java.version>17</java.version>
 		<spring-cloud.version>2024.0.0</spring-cloud.version>
+		<jar.name>api-account</jar.name>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -97,6 +98,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
+		<finalName>${jar.name}</finalName>
 	</build>
 
 </project>
