@@ -1,0 +1,57 @@
+server:
+  port: ${PORT:8080} # The port the application will run on; uses the PORT environment variable or defaults to 0 if not set.
+
+spring:
+  application:
+    name: api-account # Name of the Spring application.
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver # MySQL JDBC driver class.
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/contas_${SPRING_PROFILES_ACTIVE}_pessoaisDB?createDatabaseIfNotExist=true # Database connection URL with auto-create option.
+    username: ${DB_USER} # Database username.
+    password: ${DB_PASSWORD} # Database password.
+  jpa:
+    hibernate:
+      ddl-auto: update # Automatically updates the database schema to match the entities.
+    show-sql: true # Logs SQL queries executed by Hibernate.
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect # Hibernate dialect for MySQL 8.
+  jmx:
+    enabled: true # Enable Java Management Extensions (JMX) for monitoring.
+    mbean-domain: metrics # Set the JMX domain to "metrics".
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://rcosta.dsv.bank.api:8761/eureka # URL of the Eureka server for service discovery.
+    register-with-eureka: true # Register this service instance with the Eureka server.
+    fetch-registry: true # Fetch the Eureka service registry.
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}} # Unique instance ID for the application in Eureka.
+    prefer-ip-address: true # Prefer using the IP address for service registration.
+
+management:
+  endpoint:
+    gateway:
+      enabled: true # Enable the gateway endpoint for monitoring.
+    metrics:
+      enabled: true # Enable the metrics endpoint.
+    prometheus:
+      enabled: true # Enable the Prometheus endpoint.
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,info,prometheus # Expose these endpoints via HTTP for monitoring.
+  prometheus:
+    metrics:
+      export:
+        enabled: true # Enable Prometheus metrics export.
+springdoc:
+  show-actuator: true # Include actuator endpoints in API documentation.
+  api-docs:
+    path: /swagger-docs # Path to the OpenAPI documentation.
+  swagger-ui:
+    path: /swagger-ui.html # Path to the Swagger UI for API exploration.
+
+jar:
+  name: api-account # Name of the application's JAR file.

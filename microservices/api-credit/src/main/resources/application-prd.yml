@@ -1,0 +1,57 @@
+server:
+  port: ${PORT:8080} # The port the application will run on; uses environment variable PORT or defaults to 0 if not set.
+
+spring:
+  application:
+    name: api-credit # Name of the Spring application.
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver # MySQL JDBC driver.
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/contas_${SPRING_PROFILES_ACTIVE}_pessoaisDB?createDatabaseIfNotExist=true # Database connection URL with auto-create option.
+    username: ${DB_USER} # Database username.
+    password: ${DB_PASSWORD} # Database password.
+  jpa:
+    hibernate:
+      ddl-auto: update # Automatically update database schema based on entity mappings.
+    show-sql: true # Enable logging of SQL queries.
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect # Specifies the dialect for MySQL 8.
+  jmx:
+    enabled: true # Enable JMX monitoring.
+    mbean-domain: metrics # Set the JMX domain to "metrics".
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://rcosta.dsv.bank.api:8761/eureka # URL of the Eureka server.
+    register-with-eureka: true # Register this instance with Eureka.
+    fetch-registry: true # Fetch the registry from the Eureka server.
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}} # Unique instance ID for the application.
+    prefer-ip-address: true # Prefer IP address over hostname for service registration.
+
+management:
+  endpoint:
+    gateway:
+      enabled: true # Enable the gateway management endpoint.
+    metrics:
+      enabled: true # Enable the metrics endpoint.
+    prometheus:
+      enabled: true # Enable the Prometheus endpoint.
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,info,prometheus # Specify which endpoints are exposed via HTTP.
+  prometheus:
+    metrics:
+      export:
+        enabled: true # Enable metrics export for Prometheus.
+springdoc:
+  show-actuator: true # Include actuator endpoints in API documentation.
+  api-docs:
+    path: /swagger-docs # Path to the OpenAPI documentation.
+  swagger-ui:
+    path: /swagger-ui.html # Path to the Swagger UI.
+
+jar:
+  name: api-credit # Name of the application JAR file.

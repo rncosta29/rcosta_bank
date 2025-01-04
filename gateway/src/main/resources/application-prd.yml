@@ -1,0 +1,81 @@
+# Server configuration
+server:
+  port: 8765  # Sets the port on which the Spring server will run
+
+# Spring application name
+spring:
+  application:
+    name: gateway  # Defines the name of the application as "gateway"
+
+# Spring Cloud Gateway discovery locator configuration
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true  # Enables service discovery locator to automatically configure routes based on services registered in Eureka
+
+# Routes configuration for Spring Cloud Gateway
+      routes:
+        - id: api-credit  # ID for the route to the "api-credit" service
+          uri: lb://api-credit  # Specifies the service URL (using load balancing)
+          predicates:
+            - Path=/api-credit/**  # Defines the path predicate for routing to the "api-credit" service
+          filters:
+            - RewritePath=/api-credit(?<segment>/?.*), /${segment}  # Rewrites the path for the route
+
+        - id: api-account  # ID for the route to the "api-account" service
+          uri: lb://api-account  # Specifies the service URL (using load balancing)
+          predicates:
+            - Path=/api-account/**  # Defines the path predicate for routing to the "api-account" service
+          filters:
+            - RewritePath=/api-account(?<segment>/?.*), /${segment}  # Rewrites the path for the route
+
+# Management (Actuator) configuration
+management:
+  endpoint:
+    gateway:
+      enabled: true  # Enables the gateway management endpoint
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,info,prometheus  # Includes or excludes web-exposed management endpoints (health, metrics, etc.)
+    metrics:
+      enabled: true  # Enables the metrics endpoint
+    prometheus:
+      enabled: true  # Enables the exposure of metrics in Prometheus format
+    health:
+      show-details: when-authorized  # Specifies when to show health details (e.g., authorized requests only)
+  prometheus:
+    metrics:
+      export:
+        enabled: true # Enables the export of metrics to Prometheus
+    
+
+# Eureka client configuration for service discovery
+eureka:
+  client:
+    service-url:
+      defaultZone: http://rcosta.dsv.bank.api:8761/eureka  # URL of the Eureka server for service discovery
+    register-with-eureka: true  # Indicates that the service will register itself with Eureka
+    fetch-registry: true  # Allows the client to fetch the registry of services from Eureka
+  instance:
+    prefer-ip-address: false  # Ensures that the instance does not prefer its IP address over its hostname
+    lease-renewal-interval-in-seconds: 10  # Sets the interval for renewing the lease with Eureka in seconds
+
+# Springdoc configuration for API documentation (Swagger)
+springdoc:
+  api-docs:
+    enabled: true  # Enables API documentation generation
+    path: /swagger-docs  # Path to access the Swagger API documentation
+  swagger-ui:
+    enabled: true  # Enables the Swagger UI for API documentation
+    path: /swagger-ui.html  # Path to access the Swagger UI
+    urls:
+      - name: api-credit  # Name for the API documentation link for "api-credit"
+        url: API-CREDIT/swagger-docs  # URL for the Swagger docs of the "api-credit" service
+      - name: api-account  # Name for the API documentation link for "api-account"
+        url: API-ACCOUNT/swagger-docs  # URL for the Swagger docs of the "api-account" service
+
+# JAR file name
+jar:
+  name: gateway  # Sets the JAR file name to "gateway"

@@ -1,0 +1,102 @@
+version: "3.8"
+
+services:
+  server:
+    build:
+      context: ./server
+    container_name: server_${SPRING_PROFILES_ACTIVE}
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+    networks:
+      - dev_network
+
+  gateway:
+    build:
+      context: ./gateway
+    container_name: gateway_${SPRING_PROFILES_ACTIVE}
+    ports:
+      - "${GATEWAY_PORT}:${GATEWAY_PORT}"
+    depends_on:
+      - server
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+    networks:
+      - dev_network
+
+  api-account-1:
+    build:
+      context: ./microservices/api-account
+    container_name: api_account_1_${SPRING_PROFILES_ACTIVE}
+    ports:
+      - "${API_ACCOUNT_PORT_1}:8080"
+    depends_on:
+      - server
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_APPLICATION_INSTANCE_ID=account-1
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    networks:
+      - dev_network
+
+  api-account-2:
+    build:
+      context: ./microservices/api-account
+    container_name: api_account_2_${SPRING_PROFILES_ACTIVE}
+    ports:
+      - "${API_ACCOUNT_PORT_2}:8080"
+    depends_on:
+      - server
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_APPLICATION_INSTANCE_ID=account-2
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    networks:
+      - dev_network
+
+  api-credit-1:
+    build:
+      context: ./microservices/api-credit
+    container_name: api_credit_1_${SPRING_PROFILES_ACTIVE}
+    ports:
+      - "${API_CREDIT_PORT_1}:8080"
+    depends_on:
+      - server
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_APPLICATION_INSTANCE_ID=credit-1
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    networks:
+      - dev_network
+
+  api-credit-2:
+    build:
+      context: ./microservices/api-credit
+    container_name: api_credit_2_${SPRING_PROFILES_ACTIVE}
+    ports:
+      - "${API_CREDIT_PORT_2}:8080"
+    depends_on:
+      - server
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_APPLICATION_INSTANCE_ID=credit-2
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    networks:
+      - dev_network
+
+networks:
+  dev_network:
+    driver: bridge

@@ -1,14 +1,14 @@
 server:
-  port: ${PORT:0} # The port the application will run on; uses environment variable PORT or defaults to 0 if not set.
+  port: ${PORT:8080} # The port the application will run on; uses environment variable PORT or defaults to 0 if not set.
 
 spring:
   application:
     name: api-credit # Name of the Spring application.
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver # MySQL JDBC driver.
-    url: jdbc:mysql://192.168.15.14:3306/cadastro_contasDB?createDatabaseIfNotExist=true # Database connection URL with auto-create option.
-    username: rcosta # Database username.
-    password: rafa1234 # Database password.
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/contas_${SPRING_PROFILES_ACTIVE}_pessoaisDB?createDatabaseIfNotExist=true # Database connection URL with auto-create option.
+    username: ${DB_USER} # Database username.
+    password: ${DB_PASSWORD} # Database password.
   jpa:
     hibernate:
       ddl-auto: update # Automatically update database schema based on entity mappings.
@@ -23,7 +23,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka # URL of the Eureka server.
+      defaultZone: http://rcosta.dsv.bank.api:8761/eureka # URL of the Eureka server.
     register-with-eureka: true # Register this instance with Eureka.
     fetch-registry: true # Fetch the registry from the Eureka server.
   instance:

@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: api-account
+  cloud:
+    config:
+      uri: http://localhost:8888
+      profile: ${SPRING_PROFILES_ACTIVE:dev}
+      label: main

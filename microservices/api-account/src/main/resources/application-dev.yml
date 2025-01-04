@@ -6,9 +6,9 @@ spring:
     name: api-account # Name of the Spring application.
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver # MySQL JDBC driver class.
-    url: jdbc:mysql://192.168.15.14:3306/contas_pessoaisDB?createDatabaseIfNotExist=true # Database connection URL with auto-create option.
-    username: rcosta # Database username.
-    password: rafa1234 # Database password.
+    url: jdbc:mysql://localhost:3306/contas_${SPRING_PROFILES_ACTIVE}_pessoaisDB?createDatabaseIfNotExist=true # Database connection URL with auto-create option.
+    username: root # Database username.
+    password: 1234 # Database password.
   jpa:
     hibernate:
       ddl-auto: update # Automatically updates the database schema to match the entities.
