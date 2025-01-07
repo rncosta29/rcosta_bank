@@ -16,8 +16,5 @@ COPY start.sh /app/start.sh
 # Etapa 6: Garantindo que os scripts sejam executáveis
 RUN chmod +x /app/wait-for-it.sh /app/start.sh
 
-# Porta
-EXPOSE 8765
-
 # Etapa 7: Configurando o comando para inicialização do container
 CMD ["/app/start.sh"]

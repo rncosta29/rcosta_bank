@@ -30,6 +30,20 @@ spring:
           filters:
             - RewritePath=/api-account(?<segment>/?.*), /${segment}  # Rewrites the path for the route
 
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins: 192.168.15.15:8765
+            allowed-methods:
+            - GET
+            - POST
+            - PUT
+            - DELETE
+            - OPTIONS
+            allowed-headers:
+            - "*"
+            allow-credentials: true
+
 # Management (Actuator) configuration
 management:
   endpoint:
@@ -55,7 +69,7 @@ management:
 eureka:
   client:
     service-url:
-      defaultZone: http://serverhml:8761/eureka  # URL of the Eureka server for service discovery
+      defaultZone: http://server:8761/eureka  # URL of the Eureka server for service discovery
     register-with-eureka: true  # Indicates that the service will register itself with Eureka
     fetch-registry: true  # Allows the client to fetch the registry of services from Eureka
   instance:

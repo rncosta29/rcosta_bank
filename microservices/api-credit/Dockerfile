@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Etapa 3: Copiando o JAR gerado do projeto para o container
-COPY target/gateway.jar gateway.jar
+COPY target/api-credit.jar api-credit.jar
 
 # Etapa 4: Copiando o script wait-for-it.sh para dentro do container
 COPY wait-for-it.sh /app/wait-for-it.sh
@@ -15,9 +15,6 @@ COPY start.sh /app/start.sh
 
 # Etapa 6: Garantindo que os scripts sejam executáveis
 RUN chmod +x /app/wait-for-it.sh /app/start.sh
-
-# Porta
-EXPOSE 8765
 
 # Etapa 7: Configurando o comando para inicialização do container
 CMD ["/app/start.sh"]
