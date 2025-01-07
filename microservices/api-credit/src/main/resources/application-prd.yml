@@ -23,7 +23,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://rcosta.dsv.bank.api:8761/eureka # URL of the Eureka server.
+      defaultZone: http://serverprd:8761/eureka # URL of the Eureka server.
     register-with-eureka: true # Register this instance with Eureka.
     fetch-registry: true # Fetch the registry from the Eureka server.
   instance:

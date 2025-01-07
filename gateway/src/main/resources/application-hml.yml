@@ -55,7 +55,7 @@ management:
 eureka:
   client:
     service-url:
-      defaultZone: http://rcosta.dsv.bank.api:8761/eureka  # URL of the Eureka server for service discovery
+      defaultZone: http://serverhml:8761/eureka  # URL of the Eureka server for service discovery
     register-with-eureka: true  # Indicates that the service will register itself with Eureka
     fetch-registry: true  # Allows the client to fetch the registry of services from Eureka
   instance:

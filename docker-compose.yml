@@ -4,99 +4,128 @@ services:
   server:
     build:
       context: ./server
-    container_name: server_${SPRING_PROFILES_ACTIVE}
+    container_name: server
     ports:
-      - "${SERVER_PORT}:${SERVER_PORT}"
+      - "8761:8761"
     environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_PROFILES_ACTIVE=hml
     networks:
-      - dev_network
+      - hml_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   gateway:
     build:
       context: ./gateway
-    container_name: gateway_${SPRING_PROFILES_ACTIVE}
+    container_name: gateway
     ports:
-      - "${GATEWAY_PORT}:${GATEWAY_PORT}"
+      - "8765:8765"
     depends_on:
       - server
     environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_PROFILES_ACTIVE=hml
     networks:
-      - dev_network
+      - hml_network
+    entrypoint: ["sh", "-c", "./wait-for-it.sh server_hml:8761 -- ./start.sh"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8765/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   api-account-1:
     build:
       context: ./microservices/api-account
-    container_name: api_account_1_${SPRING_PROFILES_ACTIVE}
+    container_name: api_account_1_hml
     ports:
-      - "${API_ACCOUNT_PORT_1}:8080"
+      - "8081:8080"
     depends_on:
-      - server
+      - gateway
     environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_PROFILES_ACTIVE=hml
       - SPRING_APPLICATION_INSTANCE_ID=account-1
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
+      - EUREKA_SERVER_URL=http://server_hml:8761/eureka
     networks:
-      - dev_network
+      - hml_network
+    entrypoint: ["sh", "-c", "./wait-for-it.sh gateway_hml:8765 -- ./start.sh"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   api-account-2:
     build:
       context: ./microservices/api-account
-    container_name: api_account_2_${SPRING_PROFILES_ACTIVE}
+    container_name: api_account_2_hml
     ports:
-      - "${API_ACCOUNT_PORT_2}:8080"
+      - "8082:8080"
     depends_on:
-      - server
+      - gateway
     environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_PROFILES_ACTIVE=hml
       - SPRING_APPLICATION_INSTANCE_ID=account-2
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
+      - EUREKA_SERVER_URL=http://server_hml:8761/eureka
     networks:
-      - dev_network
+      - hml_network
+    entrypoint: ["sh", "-c", "./wait-for-it.sh gateway_hml:8765 -- ./start.sh"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   api-credit-1:
     build:
       context: ./microservices/api-credit
-    container_name: api_credit_1_${SPRING_PROFILES_ACTIVE}
+    container_name: api_credit_1_hml
     ports:
-      - "${API_CREDIT_PORT_1}:8080"
+      - "8083:8080"
     depends_on:
-      - server
+      - gateway
     environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_PROFILES_ACTIVE=hml
       - SPRING_APPLICATION_INSTANCE_ID=credit-1
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
+      - EUREKA_SERVER_URL=http://server_hml:8761/eureka
     networks:
-      - dev_network
+      - hml_network
+    entrypoint: ["sh", "-c", "./wait-for-it.sh gateway_hml:8765 -- ./start.sh"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   api-credit-2:
     build:
       context: ./microservices/api-credit
-    container_name: api_credit_2_${SPRING_PROFILES_ACTIVE}
+    container_name: api_credit_2_hml
     ports:
-      - "${API_CREDIT_PORT_2}:8080"
+      - "8084:8080"
     depends_on:
-      - server
+      - gateway
     environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_PROFILES_ACTIVE=hml
       - SPRING_APPLICATION_INSTANCE_ID=credit-2
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
+      - EUREKA_SERVER_URL=http://server_hml:8761/eureka
     networks:
-      - dev_network
+      - hml_network
+    entrypoint: ["sh", "-c", "./wait-for-it.sh gateway_hml:8765 -- ./start.sh"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
 networks:
-  dev_network:
+  hml_network:
     driver: bridge
