@@ -163,4 +163,4 @@ networks:
     driver: bridge
     
 volumes:
-  jenkins_home
+  jenkins_home:
