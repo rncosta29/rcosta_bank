@@ -30,20 +30,6 @@ spring:
           filters:
             - RewritePath=/api-account(?<segment>/?.*), /${segment}  # Rewrites the path for the route
 
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowed-origins: 192.168.15.15:8765
-            allowed-methods:
-            - GET
-            - POST
-            - PUT
-            - DELETE
-            - OPTIONS
-            allowed-headers:
-            - "*"
-            allow-credentials: true
-
 # Management (Actuator) configuration
 management:
   endpoint:
