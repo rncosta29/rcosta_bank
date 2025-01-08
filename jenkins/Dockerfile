@@ -1,28 +1,55 @@
-# Etapa 1: Usando a imagem base oficial do Jenkins
-FROM jenkins/jenkins:lts
+# Base image Jenkins LTS com Java 17
+FROM jenkins/jenkins:lts-jdk17
 
-# Etapa 2: Configurar Jenkins como usuario root para instalar ferramentas adicionais
+# Instalando utilitários necessários
 USER root
-
-# Etapa 3: Instalar Docker e Maven para execução das builds
-RUN apt-get update && apt-get install -y \
-    docker.io \
-    maven \
+RUN apt-get update && \
+    apt-get install -y \
     curl \
+    git \
+    docker.io \
     unzip \
-    wget
+    wget \
+    gnupg2 \
+    lsb-release \
+    ca-certificates && \
+    apt-get clean
 
-# Etapa 4: Instalar o Sonar Scanner para análise de codigo
-RUN wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip && \
-    unzip sonar-scanner-cli-4.6.2.2472-linux.zip -d /opt && \
-    rm sonar-scanner-cli-4.6.2.2472-linux.zip
-ENV PATH="/opt/sonar-scanner-4.6.2.2472-linux/bin:$PATH"
+# Configuração do Sonar-Scanner
+RUN mkdir -p /opt/sonar-scanner && \
+    curl -sSLo /opt/sonar-scanner/sonar-scanner-cli.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip && \
+    unzip /opt/sonar-scanner/sonar-scanner-cli.zip -d /opt/sonar-scanner && \
+    rm /opt/sonar-scanner/sonar-scanner-cli.zip && \
+    ln -s /opt/sonar-scanner/sonar-scanner-4.8.0.2856/bin/sonar-scanner /usr/local/bin/sonar-scanner
 
-# Etapa 5: Configurar permissoes para Jenkins acessar o Docker
-RUN usermod -aG docker jenkins
+# Configuração do Jenkins plugins
+RUN /usr/local/bin/install-plugins.sh \
+    sonar \
+    git \
+    docker-workflow \
+    pipeline-github-lib \
+    blueocean \
+    maven-plugin \
+    gradle-plugin \
+    mysql-database-plugin \
+    junit \
+    jacoco \
+    kubernetes-cli
 
-# Etapa 6: Voltar para o usuario Jenkins
-USER jenkins
+# Copiar o arquivo config.xml personalizado para a pasta do Jenkins
+COPY config.xml /var/jenkins_home/config.xml
 
-# Etapa 7: Expondo a porta do Jenkins
+# Configuração do ambiente
+ENV JAVA_HOME=/opt/java/openjdk
+ENV PATH=$JAVA_HOME/bin:$PATH
+ENV SONAR_SCANNER_HOME=/opt/sonar-scanner/sonar-scanner-4.8.0.2856
+
+# Porta do Jenkins
 EXPOSE 8080
+EXPOSE 50000
+
+# Volumes para persistência de dados
+VOLUME /var/jenkins_home
+
+# Definir o comando de inicialização do Jenkins
+CMD ["java", "-jar", "/usr/share/jenkins/jenkins.war"]
