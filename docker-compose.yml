@@ -30,7 +30,7 @@ services:
       - SPRING_PROFILES_ACTIVE=hml
     networks:
       - hml_network
-    entrypoint: ["sh", "-c", "./wait-for-it.sh server_hml:8761 -- ./start.sh"]
+    entrypoint: ["sh", "-c", "./wait-for-it.sh server:8761 -- ./start.sh"]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8765/actuator/health"]
       interval: 10s
@@ -49,10 +49,14 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=hml
       - SPRING_APPLICATION_INSTANCE_ID=account-1
-      - EUREKA_SERVER_URL=http://server_hml:8761/eureka
+      - EUREKA_SERVER_URL=http://server:8761/eureka
+      - DB_HOST=192.168.15.14
+      - DB_PORT=3306
+      - DB_USER=rcosta
+      - DB_PASSWORD=rafa1234
     networks:
       - hml_network
-    entrypoint: ["sh", "-c", "./wait-for-it.sh gateway_hml:8765 -- ./start.sh"]
+    entrypoint: ["sh", "-c", "./wait-for-it.sh gateway:8765 -- ./start.sh"]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 10s
@@ -71,10 +75,14 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=hml
       - SPRING_APPLICATION_INSTANCE_ID=account-2
-      - EUREKA_SERVER_URL=http://server_hml:8761/eureka
+      - EUREKA_SERVER_URL=http://server:8761/eureka
+      - DB_HOST=192.168.15.14
+      - DB_PORT=3306
+      - DB_USER=rcosta
+      - DB_PASSWORD=rafa1234
     networks:
       - hml_network
-    entrypoint: ["sh", "-c", "./wait-for-it.sh gateway_hml:8765 -- ./start.sh"]
+    entrypoint: ["sh", "-c", "./wait-for-it.sh gateway:8765 -- ./start.sh"]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 10s
@@ -93,10 +101,14 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=hml
       - SPRING_APPLICATION_INSTANCE_ID=credit-1
-      - EUREKA_SERVER_URL=http://server_hml:8761/eureka
+      - EUREKA_SERVER_URL=http://server:8761/eureka
+      - DB_HOST=192.168.15.14
+      - DB_PORT=3306
+      - DB_USER=rcosta
+      - DB_PASSWORD=rafa1234
     networks:
       - hml_network
-    entrypoint: ["sh", "-c", "./wait-for-it.sh gateway_hml:8765 -- ./start.sh"]
+    entrypoint: ["sh", "-c", "./wait-for-it.sh gateway:8765 -- ./start.sh"]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 10s
@@ -115,10 +127,14 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=hml
       - SPRING_APPLICATION_INSTANCE_ID=credit-2
-      - EUREKA_SERVER_URL=http://server_hml:8761/eureka
+      - EUREKA_SERVER_URL=http://server:8761/eureka
+      - DB_HOST=192.168.15.14
+      - DB_PORT=3306
+      - DB_USER=rcosta
+      - DB_PASSWORD=rafa1234
     networks:
       - hml_network
-    entrypoint: ["sh", "-c", "./wait-for-it.sh gateway_hml:8765 -- ./start.sh"]
+    entrypoint: ["sh", "-c", "./wait-for-it.sh gateway:8765 -- ./start.sh"]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 10s
