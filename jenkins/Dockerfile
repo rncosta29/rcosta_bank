@@ -22,8 +22,8 @@ RUN mkdir -p /opt/sonar-scanner && \
     rm /opt/sonar-scanner/sonar-scanner-cli.zip && \
     ln -s /opt/sonar-scanner/sonar-scanner-4.8.0.2856/bin/sonar-scanner /usr/local/bin/sonar-scanner
 
-# Configuração do Jenkins plugins
-RUN /usr/local/bin/install-plugins.sh \
+# Instalar plugins usando jenkins-plugin-cli
+RUN jenkins-plugin-cli --plugins \
     sonar \
     git \
     docker-workflow \
