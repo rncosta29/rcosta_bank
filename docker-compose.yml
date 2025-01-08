@@ -161,3 +161,6 @@ services:
 networks:
   hml_network:
     driver: bridge
+    
+volumes:
+  jenkins_home
