@@ -30,8 +30,8 @@ RUN jenkins-plugin-cli --plugins \
     pipeline-github-lib \
     blueocean \
     maven-plugin \
-    gradle-plugin \
-    mysql-database-plugin \
+    gradle \
+    mysql \
     junit \
     jacoco \
     kubernetes-cli
