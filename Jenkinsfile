@@ -3,62 +3,93 @@ pipeline {
 
     environment {
         SONAR_HOST_URL = "http://192.168.15.13:9000"
-		BRANCH_NAME = "hml"
+        BRANCH_NAME = "${env.BRANCH_NAME}" // A branch é obtida a partir do GitHub/Webhook
+    }
+
+    triggers {
+        // A trigger será acionada por um push para as branches dev, hml ou prd
+        githubPush()
     }
 
     stages {
+		stage('Check Branch') {
+			when {
+				branch 'main'
+				branch 'hml'
+				branch 'dev'
+			}
+			steps {
+				echo "Branch ${env.BRANCH_NAME} é válida. Continuando com o pipeline..."
+			}
+		}
+		
         stage('Checkout') {
             steps {
-                git branch: "${BRANCH_NAME}", url: 'https://github.com/rncosta29/rcosta_bank.git'
+                script {
+                    echo "Checkout da branch: ${BRANCH_NAME}"
+                    git branch: "${BRANCH_NAME}", url: 'https://github.com/rncosta29/rcosta_bank.git'
+                }
             }
         }
 
         stage('Build API Account') {
             steps {
-                dir('microservices/api-account') {
-                    sh './mvnw clean install -DskipTests'
+                script {
+                    echo "Iniciando o build da API Account"
+                    dir('microservices/api-account') {
+                        sh './mvnw clean install -DskipTests'
+                    }
                 }
             }
         }
 
         stage('SonarQube Analysis API Account') {
             steps {
-                dir('microservices/api-account') {
-                    sh """
-                    sonar-scanner \
-                        -Dsonar.projectKey=rcosta_account \
-                        -Dsonar.projectName=rcosta_account \
-                        -Dsonar.projectVersion=1.0 \
-                        -Dsonar.sources=src \
-                        -Dsonar.java.binaries=target/classes \
-                        -Dsonar.host.url=${SONAR_HOST_URL} \
-                        -Dsonar.login=sqp_12eb4412f20a0bddd08525c08299061fbdc8a68f
-                    """
+                script {
+                    echo "Iniciando a análise no SonarQube para API Account"
+                    dir('microservices/api-account') {
+                        sh """
+                        sonar-scanner \
+                            -Dsonar.projectKey=rcosta_account \
+                            -Dsonar.projectName=rcosta_account \
+                            -Dsonar.projectVersion=1.0 \
+                            -Dsonar.sources=src \
+                            -Dsonar.java.binaries=target/classes \
+                            -Dsonar.host.url=${SONAR_HOST_URL} \
+                            -Dsonar.login=${SONAR_TOKEN_API_ACCOUNT}  // Uso de variável de credenciais
+                        """
+                    }
                 }
             }
         }
 
         stage('Build API Credit') {
             steps {
-                dir('microservices/api-credit') {
-                    sh './mvnw clean install -DskipTests'
+                script {
+                    echo "Iniciando o build da API Credit"
+                    dir('microservices/api-credit') {
+                        sh './mvnw clean install -DskipTests'
+                    }
                 }
             }
         }
 
         stage('SonarQube Analysis API Credit') {
             steps {
-                dir('microservices/api-credit') {
-                    sh """
-                    sonar-scanner \
-                        -Dsonar.projectKey=rcosta_bank \
-                        -Dsonar.projectName=rcosta_bank \
-                        -Dsonar.projectVersion=1.0 \
-                        -Dsonar.sources=src \
-                        -Dsonar.java.binaries=target/classes \
-                        -Dsonar.host.url=${SONAR_HOST_URL} \
-                        -Dsonar.login=sqp_38351d60619d7b309c4a420f0e4406c7a107e9bf
-                    """
+                script {
+                    echo "Iniciando a análise no SonarQube para API Credit"
+                    dir('microservices/api-credit') {
+                        sh """
+                        sonar-scanner \
+                            -Dsonar.projectKey=rcosta_bank \
+                            -Dsonar.projectName=rcosta_bank \
+                            -Dsonar.projectVersion=1.0 \
+                            -Dsonar.sources=src \
+                            -Dsonar.java.binaries=target/classes \
+                            -Dsonar.host.url=${SONAR_HOST_URL} \
+                            -Dsonar.login=${SONAR_TOKEN_API_CREDIT}  // Uso de variável de credenciais
+                        """
+                    }
                 }
             }
         }
