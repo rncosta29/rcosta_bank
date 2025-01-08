@@ -31,7 +31,6 @@ RUN jenkins-plugin-cli --plugins \
     blueocean \
     maven-plugin \
     gradle \
-    mysql \
     junit \
     jacoco \
     kubernetes-cli
