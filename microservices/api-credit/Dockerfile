@@ -29,4 +29,4 @@ COPY start.sh /app/start.sh
 RUN chmod +x /app/wait-for-it.sh /app/start.sh
 
 # Etapa 10: Rodando o sonar-scanner antes de iniciar a API
-CMD sonar-scanner -Dsonar.projectKey=rcosta_bank -Dsonar.projectName=rcosta_bank -Dsonar.projectVersion=1.0 -Dsonar.host.url=http://192.168.15.13:9000 && /app/start.sh
+CMD sonar-scanner && /app/start.sh
