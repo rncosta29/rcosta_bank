@@ -29,4 +29,4 @@ COPY start.sh /app/start.sh
 RUN chmod +x /app/wait-for-it.sh /app/start.sh
 
 # Step 10: Running sonar-scanner before starting the API
-ENTRYPOINT ["sh", "-c", "sonar-scanner && /app/start.sh"]
+CMD ["/app/start.sh"]
