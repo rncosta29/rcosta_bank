@@ -1,32 +1,32 @@
-# Etapa 1: Usando a imagem base do Java
+# Step 1: Using the base Java image
 FROM openjdk:17-jdk-slim
 
-# Etapa 2: Instalando o Maven e o SonarQube Scanner
-RUN apt-get update && apt-get install -y wget unzip maven
+# Step 2: Installing Maven and SonarQube Scanner
+RUN apt-get update && apt-get install -y wget unzip maven curl
 RUN wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
 RUN unzip sonar-scanner-cli-4.6.2.2472-linux.zip -d /opt
 ENV PATH="/opt/sonar-scanner-4.6.2.2472-linux/bin:$PATH"
 
-# Etapa 3: Configurando o diretório de trabalho dentro do container
+# Step 3: Setting the working directory inside the container
 WORKDIR /app
 
-# Etapa 4: Copiando o código fonte para o container
+# Step 4: Copying the source code into the container
 COPY . /app
 
-# Etapa 5: Executando mvn clean install para compilar o projeto
+# Step 5: Running mvn clean install to compile the project
 RUN mvn clean install -DskipTests
 
-# Etapa 6: Copiando o JAR gerado do projeto para o container
+# Step 6: Copying the generated JAR file into the container
 COPY target/api-credit.jar api-credit.jar
 
-# Etapa 7: Copiando o script wait-for-it.sh para dentro do container
+# Step 7: Copying the wait-for-it.sh script into the container
 COPY wait-for-it.sh /app/wait-for-it.sh
 
-# Etapa 8: Copiando o script de inicialização start.sh para dentro do container
+# Step 8: Copying the start.sh initialization script into the container
 COPY start.sh /app/start.sh
 
-# Etapa 9: Garantindo que os scripts sejam executáveis
+# Step 9: Ensuring the scripts are executable
 RUN chmod +x /app/wait-for-it.sh /app/start.sh
 
-# Etapa 10: Rodando o sonar-scanner antes de iniciar a API
-CMD sonar-scanner && /app/start.sh
+# Step 10: Running sonar-scanner before starting the API
+ENTRYPOINT ["sh", "-c", "sonar-scanner && /app/start.sh"]
