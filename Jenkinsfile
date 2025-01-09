@@ -4,7 +4,7 @@ pipeline {
     environment {
         SONAR_HOST_URL = "http://192.168.15.13:9000"
         BRANCH_NAME = "${env.BRANCH_NAME}" // A branch é obtida a partir do GitHub/Webhook
-		PATH = "${env.SONAR_SCANNER_HOME}/bin:${env.PATH}"
+		SONAR_SCANNER = "/opt/sonar-scanner/sonar-scanner-4.8.0.2856/bin/sonar-scanner"
     }
 
     triggers {
@@ -58,7 +58,7 @@ pipeline {
                     withCredentials([string(credentialsId: 'SONAR_TOKEN_API_ACCOUNT', variable: 'SONAR_TOKEN')]) {
                         dir('microservices/api-account') {
                             sh """
-                            sonar-scanner \
+                            ${env.SONAR_SCANNER} \
                                 -Dsonar.projectKey=rcosta_account \
                                 -Dsonar.projectName=rcosta_account \
                                 -Dsonar.projectVersion=1.0 \
@@ -92,7 +92,7 @@ pipeline {
                     withCredentials([string(credentialsId: 'SONAR_TOKEN_API_CREDIT', variable: 'SONAR_TOKEN')]) {
                         dir('microservices/api-credit') {
                             sh """
-                            sonar-scanner \
+                            ${env.SONAR_SCANNER} \
                                 -Dsonar.projectKey=rcosta_bank \
                                 -Dsonar.projectName=rcosta_bank \
                                 -Dsonar.projectVersion=1.0 \
