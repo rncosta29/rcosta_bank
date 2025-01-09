@@ -4,6 +4,7 @@ pipeline {
     environment {
         SONAR_HOST_URL = "http://192.168.15.13:9000"
         BRANCH_NAME = "${env.BRANCH_NAME}" // A branch é obtida a partir do GitHub/Webhook
+		PATH = "${env.SONAR_SCANNER_HOME}/bin:${env.PATH}"
     }
 
     triggers {
@@ -30,6 +31,13 @@ pipeline {
                 }
             }
         }
+		
+		stage('Debug Environment') {
+			steps {
+				sh 'env'
+				sh 'sonar-scanner -h'
+			}
+		}
 
         stage('Build API Account') {
             steps {
