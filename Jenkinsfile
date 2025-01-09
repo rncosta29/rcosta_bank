@@ -57,7 +57,7 @@ pipeline {
 							-Dsonar.sources=src \
 							-Dsonar.java.binaries=target/classes \
 							-Dsonar.host.url=${SONAR_HOST_URL} \
-							-Dsonar.login=${SONAR_TOKEN_API_ACCOUNT}
+							-Dsonar.login=sqp_12eb4412f20a0bddd08525c08299061fbdc8a68f
 						"""
 					}
                 }
@@ -89,7 +89,7 @@ pipeline {
 							-Dsonar.sources=src \
 							-Dsonar.java.binaries=target/classes \
 							-Dsonar.host.url=${SONAR_HOST_URL} \
-							-Dsonar.login=${SONAR_TOKEN_API_CREDIT}
+							-Dsonar.login=sqp_38351d60619d7b309c4a420f0e4406c7a107e9bf
 						"""
 					}
                 }
