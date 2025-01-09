@@ -19,8 +19,11 @@ RUN apt-get update && \
 RUN mkdir -p /opt/sonar-scanner && \
     curl -sSLo /opt/sonar-scanner/sonar-scanner-cli.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip && \
     unzip /opt/sonar-scanner/sonar-scanner-cli.zip -d /opt/sonar-scanner && \
-    rm /opt/sonar-scanner/sonar-scanner-cli.zip && \
-    ln -s /opt/sonar-scanner/sonar-scanner-4.8.0.2856/bin/sonar-scanner /usr/local/bin/sonar-scanner
+    rm /opt/sonar-scanner/sonar-scanner-cli.zip
+
+# Configuração do PATH
+ENV SONAR_SCANNER_HOME=/opt/sonar-scanner/sonar-scanner-4.8.0.2856
+ENV PATH="${SONAR_SCANNER_HOME}/bin:${PATH}"
 
 # Instalar plugins usando jenkins-plugin-cli
 RUN jenkins-plugin-cli --plugins \
@@ -40,9 +43,7 @@ COPY config.xml /var/jenkins_home/config.xml
 
 # Configuração do ambiente
 ENV JAVA_HOME=/opt/java/openjdk
-ENV PATH=$JAVA_HOME/bin:$PATH
-ENV SONAR_SCANNER_HOME=/opt/sonar-scanner/sonar-scanner-4.8.0.2856
-ENV PATH=/opt/sonar-scanner/sonar-scanner-4.8.0.2856/bin:$PATH
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 # Porta do Jenkins
 EXPOSE 8080
