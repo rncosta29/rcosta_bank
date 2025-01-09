@@ -7,22 +7,21 @@ pipeline {
     }
 
     triggers {
-        // A trigger sera acionada por um push para as branches dev, hml ou prd
         githubPush()
     }
 
     stages {
-		stage('Check Branch') {
-			when {
-				branch 'main'
-				branch 'hml'
-				branch 'dev'
-			}
-			steps {
-				echo "Branch ${env.BRANCH_NAME} é válida. Continuando com o pipeline..."
-			}
-		}
-		
+        stage('Check Branch') {
+            when {
+                branch 'main'
+                branch 'hml'
+                branch 'dev'
+            }
+            steps {
+                echo "Branch ${env.BRANCH_NAME} é válida. Continuando com o pipeline..."
+            }
+        }
+        
         stage('Checkout') {
             steps {
                 script {
@@ -37,7 +36,7 @@ pipeline {
                 script {
                     echo "Iniciando o build da API Account"
                     dir('microservices/api-account') {
-						sh 'chmod +x ./mvnw'
+                        sh 'chmod +x ./mvnw'
                         sh './mvnw clean install -DskipTests'
                     }
                 }
@@ -48,20 +47,20 @@ pipeline {
             steps {
                 script {
                     echo "Iniciando a análise no SonarQube para API Account"
-					withCredentials([string(credentialsId: 'SONAR_TOKEN_API_ACCOUNT', variable: 'SONAR_TOKEN')]) {
-						dir('microservices/api-account') {
-							sh """
-							sonar-scanner \
-								-Dsonar.projectKey=rcosta_account \
-								-Dsonar.projectName=rcosta_account \
-								-Dsonar.projectVersion=1.0 \
-								-Dsonar.sources=src \
-								-Dsonar.java.binaries=target/classes \
-								-Dsonar.host.url=${SONAR_HOST_URL} \
-								-Dsonar.login=${SONAR_TOKEN_API_ACCOUNT}  // Uso de variável de credenciais
-							"""
-						}
-					}
+                    withCredentials([string(credentialsId: 'SONAR_TOKEN_API_ACCOUNT', variable: 'SONAR_TOKEN')]) {
+                        dir('microservices/api-account') {
+                            sh """
+                            sonar-scanner \
+                                -Dsonar.projectKey=rcosta_account \
+                                -Dsonar.projectName=rcosta_account \
+                                -Dsonar.projectVersion=1.0 \
+                                -Dsonar.sources=src \
+                                -Dsonar.java.binaries=target/classes \
+                                -Dsonar.host.url=${SONAR_HOST_URL} \
+                                -Dsonar.login=${SONAR_TOKEN}
+                            """
+                        }
+                    }
                 }
             }
         }
@@ -71,7 +70,7 @@ pipeline {
                 script {
                     echo "Iniciando o build da API Credit"
                     dir('microservices/api-credit') {
-						sh 'chmod +x ./mvnw'
+                        sh 'chmod +x ./mvnw'
                         sh './mvnw clean install -DskipTests'
                     }
                 }
@@ -82,20 +81,20 @@ pipeline {
             steps {
                 script {
                     echo "Iniciando a análise no SonarQube para API Credit"
-					withCredentials([string(credentialsId: 'SONAR_TOKEN_API_CREDIT', variable: 'SONAR_TOKEN')]) {
-						dir('microservices/api-credit') {
-							sh """
-							sonar-scanner \
-								-Dsonar.projectKey=rcosta_bank \
-								-Dsonar.projectName=rcosta_bank \
-								-Dsonar.projectVersion=1.0 \
-								-Dsonar.sources=src \
-								-Dsonar.java.binaries=target/classes \
-								-Dsonar.host.url=${SONAR_HOST_URL} \
-								-Dsonar.login=${SONAR_TOKEN_API_CREDIT}  // Uso de variável de credenciais
-							"""
-						}
-					}
+                    withCredentials([string(credentialsId: 'SONAR_TOKEN_API_CREDIT', variable: 'SONAR_TOKEN')]) {
+                        dir('microservices/api-credit') {
+                            sh """
+                            sonar-scanner \
+                                -Dsonar.projectKey=rcosta_bank \
+                                -Dsonar.projectName=rcosta_bank \
+                                -Dsonar.projectVersion=1.0 \
+                                -Dsonar.sources=src \
+                                -Dsonar.java.binaries=target/classes \
+                                -Dsonar.host.url=${SONAR_HOST_URL} \
+                                -Dsonar.login=${SONAR_TOKEN}
+                            """
+                        }
+                    }
                 }
             }
         }
