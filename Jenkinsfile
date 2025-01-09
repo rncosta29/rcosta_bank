@@ -4,7 +4,7 @@ pipeline {
     environment {
         SONAR_HOST_URL = "http://192.168.15.13:9000"
         BRANCH_NAME = "${env.BRANCH_NAME}" // A branch é obtida a partir do GitHub/Webhook
-		SONAR_SCANNER = "/opt/sonar-scanner/sonar-scanner-4.8.0.2856/bin/sonar-scanner"
+		SONAR_SCANNER = "/opt/sonar-scanner/sonar-scanner-4.8.0.2856-linux/bin/sonar-scanner"
     }
 
     triggers {
