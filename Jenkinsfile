@@ -48,20 +48,18 @@ pipeline {
             steps {
                 script {
                     echo "Iniciando a análise no SonarQube para API Account"
-                    withCredentials([string(credentialsId: 'SONAR_TOKEN_API_ACCOUNT', variable: 'SONAR_TOKEN')]) {
-                        dir('microservices/api-account') {
-                            sh """
-                            ${env.SONAR_SCANNER} \
-                                -Dsonar.projectKey=rcosta_account \
-                                -Dsonar.projectName=rcosta_account \
-                                -Dsonar.projectVersion=1.0 \
-                                -Dsonar.sources=src \
-                                -Dsonar.java.binaries=target/classes \
-                                -Dsonar.host.url=${SONAR_HOST_URL} \
-                                -Dsonar.login=${SONAR_TOKEN}
-                            """
-                        }
-                    }
+					dir('microservices/api-account') {
+						sh """
+						${env.SONAR_SCANNER} \
+							-Dsonar.projectKey=rcosta_account \
+							-Dsonar.projectName=rcosta_account \
+							-Dsonar.projectVersion=1.0 \
+							-Dsonar.sources=src \
+							-Dsonar.java.binaries=target/classes \
+							-Dsonar.host.url=${SONAR_HOST_URL} \
+							-Dsonar.login=${SONAR_TOKEN_API_ACCOUNT}
+						"""
+					}
                 }
             }
         }
@@ -82,20 +80,18 @@ pipeline {
             steps {
                 script {
                     echo "Iniciando a análise no SonarQube para API Credit"
-                    withCredentials([string(credentialsId: 'SONAR_TOKEN_API_CREDIT', variable: 'SONAR_TOKEN')]) {
-                        dir('microservices/api-credit') {
-                            sh """
-                            ${env.SONAR_SCANNER} \
-                                -Dsonar.projectKey=rcosta_bank \
-                                -Dsonar.projectName=rcosta_bank \
-                                -Dsonar.projectVersion=1.0 \
-                                -Dsonar.sources=src \
-                                -Dsonar.java.binaries=target/classes \
-                                -Dsonar.host.url=${SONAR_HOST_URL} \
-                                -Dsonar.login=${SONAR_TOKEN}
-                            """
-                        }
-                    }
+					dir('microservices/api-credit') {
+						sh """
+						${env.SONAR_SCANNER} \
+							-Dsonar.projectKey=rcosta_bank \
+							-Dsonar.projectName=rcosta_bank \
+							-Dsonar.projectVersion=1.0 \
+							-Dsonar.sources=src \
+							-Dsonar.java.binaries=target/classes \
+							-Dsonar.host.url=${SONAR_HOST_URL} \
+							-Dsonar.login=${SONAR_TOKEN_API_CREDIT}
+						"""
+					}
                 }
             }
         }
