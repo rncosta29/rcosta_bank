@@ -22,7 +22,7 @@ RUN mkdir -p /opt/sonar-scanner && \
     rm /opt/sonar-scanner/sonar-scanner-cli.zip
 
 # Configuração do PATH
-ENV PATH="/opt/sonar-scanner/sonar-scanner-4.8.0.2856/bin:${PATH}"
+ENV PATH="/opt/sonar-scanner/sonar-scanner-4.8.0.2856-linux/bin:${PATH}"
 
 # Instalar plugins usando jenkins-plugin-cli
 RUN jenkins-plugin-cli --plugins \
