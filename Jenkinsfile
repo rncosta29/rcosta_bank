@@ -31,13 +31,6 @@ pipeline {
                 }
             }
         }
-		
-		stage('Debug Environment') {
-			steps {
-				sh 'env'
-				sh 'sonar-scanner -h'
-			}
-		}
 
         stage('Build API Account') {
             steps {
