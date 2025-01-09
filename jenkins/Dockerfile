@@ -42,6 +42,7 @@ COPY config.xml /var/jenkins_home/config.xml
 ENV JAVA_HOME=/opt/java/openjdk
 ENV PATH=$JAVA_HOME/bin:$PATH
 ENV SONAR_SCANNER_HOME=/opt/sonar-scanner/sonar-scanner-4.8.0.2856
+ENV PATH=/opt/sonar-scanner/sonar-scanner-4.8.0.2856/bin:$PATH
 
 # Porta do Jenkins
 EXPOSE 8080
