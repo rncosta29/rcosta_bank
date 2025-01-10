@@ -16,6 +16,7 @@ RUN apt-get update && \
     apt-get clean
 
 # Configuração do Sonar-Scanner
+# Teste para Jenkins
 RUN mkdir -p /opt/sonar-scanner && \
     curl -sSLo /opt/sonar-scanner/sonar-scanner-cli.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip && \
     unzip /opt/sonar-scanner/sonar-scanner-cli.zip -d /opt/sonar-scanner && \
