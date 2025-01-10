@@ -5,6 +5,10 @@ pipeline {
         SONAR_HOST_URL = "http://192.168.15.13:9000"
         BRANCH_NAME = "${env.BRANCH_NAME}" // A branch é obtida a partir do GitHub/Webhook
 		SONAR_SCANNER = "/opt/sonar-scanner/sonar-scanner-4.8.0.2856-linux/bin/sonar-scanner"
+		DB_HOST = credentials('DB_HOST')
+		DB_PORT = credentials('DB_PORT')
+		DB_USER = credentials('DB_USER')
+		DB_PASSWORD = credentials('DB_PASSWORD')
     }
 
     triggers {
@@ -20,6 +24,17 @@ pipeline {
             }
             steps {
                 echo "Branch ${env.BRANCH_NAME} é válida. Continuando com o pipeline..."
+            }
+        }
+		
+        stage('Test Environment Variables') {
+            steps {
+                script {
+                    sh """
+                    echo DB_HOST: $DB_HOST
+                    echo DB_PORT: $DB_PORT
+                    """
+                }
             }
         }
         
