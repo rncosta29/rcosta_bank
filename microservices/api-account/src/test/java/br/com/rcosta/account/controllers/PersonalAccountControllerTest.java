@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+
 
 import java.net.URI;
 
@@ -82,17 +84,17 @@ class PersonalAccountControllerTest {
         DebitAccountDto debitAccountDto = new DebitAccountDto();
         debitAccountDto.setId(2L);
 
-        // O uso correto do eq() para o id
-        when(personalAccountService.addDebitToPersonalAccount(eq(id), debitAccountDto)).thenReturn(debitAccountDto);
-
+        // Usando matchers para ambos os parâmetros
+        when(personalAccountService.addDebitToPersonalAccount(eq(id), any(DebitAccountDto.class))).thenReturn(debitAccountDto);
 
         // Act
         ResponseEntity<DebitAccountDto> response = personalAccountController.addDebitToPersonalAccount(id, debitAccountDto);
 
         // Assert
         assertNotNull(response);
-        assertEquals(200, response.getStatusCode().value());
+        assertEquals(200, response.getStatusCode().value()); // Atualizado para não usar o método deprecated
         assertNotNull(response.getBody());
         assertEquals(2L, response.getBody().getId());
     }
+
 }

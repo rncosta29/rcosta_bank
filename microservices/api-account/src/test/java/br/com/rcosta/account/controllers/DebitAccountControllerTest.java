@@ -11,15 +11,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import br.com.rcosta.account.controller.DebitAccountController;
 import br.com.rcosta.account.dto.DebitAccountDto;
 import br.com.rcosta.account.services.DebitAccountService;
 
-public class DebitAccountControllerTest {
+class DebitAccountControllerTest {
 
-	@Mock
+    @Mock
     private DebitAccountService debitAccountService;
 
     @InjectMocks
@@ -30,11 +31,11 @@ public class DebitAccountControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @SuppressWarnings("deprecation")
-	@Test
+    @Test
     void shouldReturnDebitById() {
         // Arrange
         DebitAccountDto dto = new DebitAccountDto();
+        dto.setId(1L); // Adicionando dados para o DTO
         when(debitAccountService.getDebitById(1L)).thenReturn(dto);
 
         // Act
@@ -42,15 +43,17 @@ public class DebitAccountControllerTest {
 
         // Assert
         assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
         assertEquals(dto, response.getBody());
     }
 
-    @SuppressWarnings("deprecation")
-	@Test
+    @Test
     void shouldReturnAllDebitsByPersonalAccountId() {
         // Arrange
-        List<DebitAccountDto> debitList = List.of(new DebitAccountDto());
+        DebitAccountDto dto = new DebitAccountDto();
+        dto.setId(1L); // Adicionando dados para o DTO
+        List<DebitAccountDto> debitList = List.of(dto);
         when(debitAccountService.getDebitByPersonalAccountId(1L)).thenReturn(debitList);
 
         // Act
@@ -58,7 +61,8 @@ public class DebitAccountControllerTest {
 
         // Assert
         assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
         assertEquals(debitList, response.getBody());
     }
 }
