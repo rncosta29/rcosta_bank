@@ -28,7 +28,7 @@ ENV PATH="/opt/sonar-scanner/sonar-scanner-4.8.0.2856-linux/bin:${PATH}"
 RUN jenkins-plugin-cli --plugins \
     sonar \
     git \
-	github \
+    github \
     docker-workflow \
     pipeline-github-lib \
     blueocean \
