@@ -1,6 +1,5 @@
 package br.com.rcosta.account.controllers;
 
-import static org.hamcrest.CoreMatchers.any;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -22,7 +21,7 @@ import br.com.rcosta.account.dto.DebitAccountDto;
 import br.com.rcosta.account.dto.PersonalAccountDto;
 import br.com.rcosta.account.services.PersonalAccountService;
 
-public class PersonalAccountControllerTest {
+class PersonalAccountControllerTest {
 
 	@Mock
     private PersonalAccountService personalAccountService;
@@ -35,22 +34,21 @@ public class PersonalAccountControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @SuppressWarnings("deprecation")
-	@Test
+    @Test
     void testCreateCreditCard() {
         // Arrange
         PersonalAccountDto personalAccountDto = new PersonalAccountDto();
         personalAccountDto.setId(1L);
         
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance();
-        when(personalAccountService.addPersonalAccount((PersonalAccountDto) any(PersonalAccountDto.class))).thenReturn(personalAccountDto);
+        when(personalAccountService.addPersonalAccount(personalAccountDto)).thenReturn(personalAccountDto);
         
         // Act
         ResponseEntity<PersonalAccountDto> response = personalAccountController.createCreditCard(personalAccountDto, uriBuilder);
 
         // Assert
         assertNotNull(response);
-        assertEquals(201, response.getStatusCodeValue());
+        assertEquals(201, response.getStatusCode().value());
         assertNotNull(response.getBody());
         assertEquals(1L, response.getBody().getId());
         URI location = response.getHeaders().getLocation();
@@ -58,8 +56,7 @@ public class PersonalAccountControllerTest {
         assertTrue(location.getPath().contains("1")); // Verifica se o id está presente na URL
     }
 
-    @SuppressWarnings("deprecation")
-	@Test
+    @Test
     void testFindCreditCardById() {
         // Arrange
         Long id = 1L;
@@ -73,12 +70,11 @@ public class PersonalAccountControllerTest {
 
         // Assert
         assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
         assertEquals(id, response.getBody().getId());
     }
 
-    @SuppressWarnings("deprecation")
     @Test
     void testAddDebitToPersonalAccount() {
         // Arrange
@@ -87,14 +83,15 @@ public class PersonalAccountControllerTest {
         debitAccountDto.setId(2L);
 
         // O uso correto do eq() para o id
-        when(personalAccountService.addDebitToPersonalAccount(eq(id), (DebitAccountDto) any(DebitAccountDto.class))).thenReturn(debitAccountDto);
+        when(personalAccountService.addDebitToPersonalAccount(eq(id), debitAccountDto)).thenReturn(debitAccountDto);
+
 
         // Act
         ResponseEntity<DebitAccountDto> response = personalAccountController.addDebitToPersonalAccount(id, debitAccountDto);
 
         // Assert
         assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
         assertEquals(2L, response.getBody().getId());
     }
