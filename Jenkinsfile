@@ -69,8 +69,8 @@ pipeline {
                 script {
                     echo "Iniciando o build da API Credit"
                     dir('microservices/api-credit') {
-                        sh 'chmod +x ./mvnw -DskipTests'
-                        sh './mvnw clean install'
+                        sh 'chmod +x ./mvnw'
+                        sh './mvnw clean install -DskipTests'
                     }
                 }
             }
