@@ -6,7 +6,7 @@ spring:
     name: api-account # Name of the Spring application.
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver # MySQL JDBC driver class.
-    url: jdbc:mysql://192.168.15.13:3306/contas_hml_pessoaisDB?createDatabaseIfNotExist=true # Database connection URL with auto-create option.
+    url: jdbc:mysql://192.168.15.14:3306/contas_hml_pessoaisDB?createDatabaseIfNotExist=true # Database connection URL with auto-create option.
     username: rcosta # Database username.
     password: rafa1234 # Database password.
   jpa:
