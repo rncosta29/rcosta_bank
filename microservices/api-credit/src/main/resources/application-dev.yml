@@ -6,7 +6,7 @@ spring:
     name: api-credit # Name of the Spring application.
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver # MySQL JDBC driver.
-    url: jdbc:mysql://localhost:3306/contas_${SPRING_PROFILES_ACTIVE}_pessoaisDB?createDatabaseIfNotExist=true # Database connection URL with auto-create option.
+    url: jdbc:mysql://localhost:3306/credit_${SPRING_PROFILES_ACTIVE}_contasDB?createDatabaseIfNotExist=true # Database connection URL with auto-create option.
     username: root # Database username.
     password: rafa1234 # Database password.
   jpa:
