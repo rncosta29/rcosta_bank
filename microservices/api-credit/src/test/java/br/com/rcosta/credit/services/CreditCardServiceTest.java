@@ -15,12 +15,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import br.com.rcosta.credit.dto.CreditCardDto;
 import br.com.rcosta.credit.models.CreditCardModel;
 import br.com.rcosta.credit.repositories.CreditCardRepository;
 import jakarta.persistence.EntityNotFoundException;
 
+@SpringBootTest
 public class CreditCardServiceTest {
 
 	@InjectMocks
