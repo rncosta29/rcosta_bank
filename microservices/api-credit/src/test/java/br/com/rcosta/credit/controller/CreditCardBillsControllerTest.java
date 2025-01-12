@@ -17,6 +17,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.rcosta.credit.dto.CreditCardBillsDto;
 import br.com.rcosta.credit.services.CreditCardBillsService;
@@ -29,6 +31,9 @@ public class CreditCardBillsControllerTest {
 
     @Mock
     private CreditCardBillsService creditCardBillsService;
+    
+    @Mock
+    private UriComponentsBuilder uriBuilder;
 
     private CreditCardBillsDto creditCardBillsDto;
 
@@ -58,15 +63,29 @@ public class CreditCardBillsControllerTest {
 
     @Test
     void createBills_ShouldReturnCreatedStatus_WhenBillsAreCreated() {
+        // Mockando o comportamento do serviço
         List<CreditCardBillsDto> billsList = List.of(creditCardBillsDto);
         when(creditCardBillsService.addNewBills(any(), anyInt())).thenReturn(billsList);
 
-        ResponseEntity<List<CreditCardBillsDto>> response = creditCardBillsController.createBills(creditCardBillsDto, 1, null);
+        // Mockando o comportamento do UriComponentsBuilder e UriComponents
+        UriComponents uriComponents = UriComponentsBuilder.fromPath("/api/v1/bills/1").build(); // Criando um UriComponents
 
+        // Simulando os métodos do UriComponentsBuilder
+        when(uriBuilder.path("/api/v1/bills/{id}")).thenReturn(uriBuilder);
+        when(uriBuilder.buildAndExpand(creditCardBillsDto.getId())).thenReturn(uriComponents);
+
+        // Simulando o comportamento de toUri() no UriComponents
+        when(uriComponents.toUri()).thenReturn(uriComponents.toUri());
+
+        // Chama o método do controller passando o mock de UriComponentsBuilder
+        ResponseEntity<List<CreditCardBillsDto>> response = creditCardBillsController.createBills(creditCardBillsDto, 1, uriBuilder);
+
+        // Verifica o status da resposta e o corpo
         assertNotNull(response);
         assertEquals(201, response.getStatusCode().value());
         assertEquals(billsList, response.getBody());
     }
+
 
     @Test
     void deleteBill_ShouldReturnNoContent_WhenBillDeletedSuccessfully() {
