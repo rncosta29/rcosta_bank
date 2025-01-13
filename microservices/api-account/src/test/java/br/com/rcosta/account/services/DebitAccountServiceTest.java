@@ -107,4 +107,78 @@ public class DebitAccountServiceTest {
         verify(debitAccountRepository, times(1)).delete(debitAccount);
         verify(personalAccountRepository, times(1)).save(personalAccount);
     }
+    
+    @Test
+    void shouldUpdateDebit() {
+        // Arrange
+        Long debitId = 1L;
+        DebitAccountDto debitDto = new DebitAccountDto();
+        debitDto.setDate(LocalDate.now());
+        debitDto.setInstitution(INSTITUTION_NAME);
+        debitDto.setPrice(150.0);
+        DebitAccountModel debitAccount = new DebitAccountModel(debitId, INSTITUTION_NAME, LocalDate.now(), 100.0);
+        PersonalAccountModel personalAccount = new PersonalAccountModel(1L, ACCOUNT_NAME, 1000.0);
+        debitAccount.setPersonalAccount(personalAccount);
+
+        when(debitAccountRepository.findById(debitId)).thenReturn(Optional.of(debitAccount));
+        when(modelMapper.map(debitDto, DebitAccountModel.class)).thenReturn(debitAccount);
+        when(modelMapper.map(debitAccount, DebitAccountDto.class)).thenReturn(debitDto);
+
+        // Act
+        DebitAccountDto result = debitAccountService.updateDebit(debitId, debitDto);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(debitDto.getInstitution(), result.getInstitution());
+        verify(debitAccountRepository, times(1)).save(debitAccount);
+        verify(personalAccountRepository, times(1)).save(personalAccount);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDebitToUpdateNotFound() {
+        // Arrange
+        DebitAccountDto debitDto = new DebitAccountDto();
+        when(debitAccountRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(EntityNotFoundException.class, () -> debitAccountService.updateDebit(1L, debitDto));
+    }
+
+    @Test
+    void shouldReturnAllDebitsByPersonalAccountId() {
+        // Arrange
+        Long personalAccountId = 1L;
+        DebitAccountModel debitAccount = new DebitAccountModel(1L, INSTITUTION_NAME, LocalDate.now(), 100.0);
+        DebitAccountDto debitAccountDto = new DebitAccountDto();
+        when(debitAccountRepository.findByPersonalAccountId(personalAccountId)).thenReturn(List.of(debitAccount));
+        when(modelMapper.map(debitAccount, DebitAccountDto.class)).thenReturn(debitAccountDto);
+
+        // Act
+        List<DebitAccountDto> result = debitAccountService.getDebitByPersonalAccountId(personalAccountId);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(debitAccountRepository, times(1)).findByPersonalAccountId(personalAccountId);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDebitNotFoundForDeletion() {
+        // Arrange
+        when(debitAccountRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(EntityNotFoundException.class, () -> debitAccountService.deleteDebitById(1L));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDebitAccountNotAssociatedWithPersonalAccount() {
+        // Arrange
+        DebitAccountModel debitAccount = new DebitAccountModel(1L, INSTITUTION_NAME, LocalDate.now(), 100.0);
+        when(debitAccountRepository.findById(1L)).thenReturn(Optional.of(debitAccount));
+
+        // Act & Assert
+        assertThrows(IllegalStateException.class, () -> debitAccountService.deleteDebitById(1L));
+    }
+
 }
