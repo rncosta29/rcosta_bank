@@ -17,7 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.rcosta.credit.dto.CreditCardBillsDto;
@@ -68,17 +67,17 @@ public class CreditCardBillsControllerTest {
         when(creditCardBillsService.addNewBills(any(), anyInt())).thenReturn(billsList);
 
         // Mockando o comportamento do UriComponentsBuilder e UriComponents
-        UriComponents uriComponents = UriComponentsBuilder.fromPath("/api/v1/bills/1").build(); // Criando um UriComponents
+        // UriComponents uriComponents = UriComponentsBuilder.fromPath("/api/v1/bills/{id}").buildAndExpand(creditCardBillsDto.getId()); // Criando um UriComponents
 
-        // Simulando os métodos do UriComponentsBuilder
-        when(uriBuilder.path("/api/v1/bills/{id}")).thenReturn(uriBuilder);
-        when(uriBuilder.buildAndExpand(creditCardBillsDto.getId())).thenReturn(uriComponents);
-
-        // Simulando o comportamento de toUri() no UriComponents
-        when(uriComponents.toUri()).thenReturn(uriComponents.toUri());
+//        // Simulando os métodos do UriComponentsBuilder
+//        when(uriBuilder.path("/api/v1/bills/{id}")).thenReturn(uriBuilder);
+//        when(uriBuilder.buildAndExpand(creditCardBillsDto.getId())).thenReturn(uriComponents);
+//
+//        // Simulando o comportamento de toUri() no UriComponents
+//        when(uriComponents.toUri()).thenReturn(uriComponents.toUri());
 
         // Chama o método do controller passando o mock de UriComponentsBuilder
-        ResponseEntity<List<CreditCardBillsDto>> response = creditCardBillsController.createBills(creditCardBillsDto, 1, uriBuilder);
+        ResponseEntity<List<CreditCardBillsDto>> response = creditCardBillsController.createBills(creditCardBillsDto, 1, UriComponentsBuilder.newInstance());
 
         // Verifica o status da resposta e o corpo
         assertNotNull(response);

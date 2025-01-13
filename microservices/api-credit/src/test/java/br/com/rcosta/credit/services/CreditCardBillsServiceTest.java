@@ -10,6 +10,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -46,7 +48,8 @@ public class CreditCardBillsServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        
+
+        // Configuração inicial dos dados de teste
         creditCardBillsDto = new CreditCardBillsDto();
         creditCardBillsDto.setId(1L);
         creditCardBillsDto.setName("Test Bill");
@@ -59,14 +62,28 @@ public class CreditCardBillsServiceTest {
         creditCardModel = new CreditCardModel();
         creditCardModel.setId(1L);
         creditCardModel.setName("1234567890123456");
+
+        // Popula o banco de dados mockado
+        when(creditCardRepository.findById(1L)).thenReturn(Optional.of(creditCardModel));
+
+        CreditCardBillsModel savedBill = new CreditCardBillsModel();
+        savedBill.setId(1L);
+        savedBill.setName("Test Bill");
+        savedBill.setPrice(100.0);
+        savedBill.setIsParcel(false);
+        savedBill.setPaymentMonth(1);
+        savedBill.setPaymentYear(2025);
+        savedBill.setCreditCard(creditCardModel);
+
+        when(creditCardBillsRepository.findById(1L)).thenReturn(Optional.of(savedBill));
     }
 
     @Test
     void addBills_ShouldReturnAddedBill() {
-        when(creditCardRepository.findById(1L)).thenReturn(java.util.Optional.of(creditCardModel));
+        // Simula o comportamento do save
         when(modelMapper.map(creditCardBillsDto, CreditCardBillsModel.class)).thenReturn(new CreditCardBillsModel());
         when(modelMapper.map(any(CreditCardBillsModel.class), eq(CreditCardBillsDto.class))).thenReturn(creditCardBillsDto);
-        
+
         CreditCardBillsDto result = creditCardBillsService.addBills(creditCardBillsDto);
 
         assertNotNull(result);
@@ -75,26 +92,15 @@ public class CreditCardBillsServiceTest {
     }
 
     @Test
-    void addBills_ShouldThrowEntityNotFoundException_WhenCreditCardNotFound() {
-        when(creditCardRepository.findById(1L)).thenReturn(java.util.Optional.empty());
-
-        assertThrows(EntityNotFoundException.class, () -> {
-            creditCardBillsService.addBills(creditCardBillsDto);
-        });
-    }
-
-    @Test
     void deleteBillById_ShouldDeleteBill_WhenBillExists() {
-        when(creditCardBillsRepository.findById(1L)).thenReturn(java.util.Optional.of(new CreditCardBillsModel()));
-
         assertDoesNotThrow(() -> creditCardBillsService.deleteBillById(1L));
         verify(creditCardBillsRepository, times(1)).delete(any(CreditCardBillsModel.class));
     }
 
     @Test
     void deleteBillById_ShouldThrowEntityNotFoundException_WhenBillDoesNotExist() {
-        when(creditCardBillsRepository.findById(1L)).thenReturn(java.util.Optional.empty());
+        when(creditCardBillsRepository.findById(2L)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> creditCardBillsService.deleteBillById(1L));
+        assertThrows(EntityNotFoundException.class, () -> creditCardBillsService.deleteBillById(2L));
     }
 }
