@@ -10,6 +10,7 @@ class ApiAccountApplicationTests {
 
 	@Test
 	void contextLoads() {
+		// Este teste garante que o contexto do Spring seja carregado corretamente.
 	}
 
 }

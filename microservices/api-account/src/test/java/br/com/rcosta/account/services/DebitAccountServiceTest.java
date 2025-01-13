@@ -23,6 +23,9 @@ import br.com.rcosta.account.repositories.PersonalAccountRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 public class DebitAccountServiceTest {
+	
+	private static final String INSTITUTION_NAME = "Institution";
+	private static final String ACCOUNT_NAME = "Account";
 
 	@Mock
     private DebitAccountRepository debitAccountRepository;
@@ -44,7 +47,7 @@ public class DebitAccountServiceTest {
     @Test
     void shouldReturnAllDebits() {
         // Arrange
-        DebitAccountModel debitAccount = new DebitAccountModel(1L, "Institution", LocalDate.now(), 100.0);
+        DebitAccountModel debitAccount = new DebitAccountModel(1L, INSTITUTION_NAME, LocalDate.now(), 100.0);
         DebitAccountDto debitAccountDto = new DebitAccountDto();
         when(debitAccountRepository.findAll()).thenReturn(List.of(debitAccount));
         when(modelMapper.map(debitAccount, DebitAccountDto.class)).thenReturn(debitAccountDto);
@@ -63,8 +66,8 @@ public class DebitAccountServiceTest {
         // Arrange
         DebitAccountDto debitDto = new DebitAccountDto();
         debitDto.setPersonalAccountId(1L);
-        PersonalAccountModel personalAccount = new PersonalAccountModel(1L, "Account", 0.0);
-        DebitAccountModel debitAccount = new DebitAccountModel(1L, "Institution", LocalDate.now(), 100.0);
+        PersonalAccountModel personalAccount = new PersonalAccountModel(1L, ACCOUNT_NAME, 0.0);
+        DebitAccountModel debitAccount = new DebitAccountModel(1L, INSTITUTION_NAME, LocalDate.now(), 100.0);
         when(personalAccountRepository.findById(1L)).thenReturn(Optional.of(personalAccount));
         when(modelMapper.map(debitDto, DebitAccountModel.class)).thenReturn(debitAccount);
         when(modelMapper.map(debitAccount, DebitAccountDto.class)).thenReturn(debitDto);
@@ -91,8 +94,8 @@ public class DebitAccountServiceTest {
     @Test
     void shouldDeleteDebit() {
         // Arrange
-        DebitAccountModel debitAccount = new DebitAccountModel(1L, "Institution", LocalDate.now(), 100.0);
-        PersonalAccountModel personalAccount = new PersonalAccountModel(1L, "Account", 0.0);
+        DebitAccountModel debitAccount = new DebitAccountModel(1L, INSTITUTION_NAME, LocalDate.now(), 100.0);
+        PersonalAccountModel personalAccount = new PersonalAccountModel(1L, ACCOUNT_NAME, 0.0);
         debitAccount.setPersonalAccount(personalAccount);
 
         when(debitAccountRepository.findById(1L)).thenReturn(Optional.of(debitAccount));

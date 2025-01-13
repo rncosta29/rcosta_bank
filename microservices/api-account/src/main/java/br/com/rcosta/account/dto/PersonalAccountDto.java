@@ -8,8 +8,6 @@ public class PersonalAccountDto {
 	private String nameAccount;
 	private Double balance;
 	private List<DebitAccountDto> debitAccountModel;
-	
-	public PersonalAccountDto() { }
 
 	public Long getId() {
 		return id;

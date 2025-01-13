@@ -50,8 +50,8 @@ public class DebitAccountService {
     }
 	
 	public DebitAccountDto getDebitById(Long id) {
-		DebitAccountModel model =  debitAccountRepository.findById(id)
-				.orElseThrow(() -> new EntityNotFoundException());
+		DebitAccountModel model = debitAccountRepository.findById(id)
+			    .orElseThrow(EntityNotFoundException::new);
 		
 		return modelMapper.map(model, DebitAccountDto.class);
 	}

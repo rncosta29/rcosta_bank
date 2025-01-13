@@ -10,8 +10,6 @@ public class DebitAccountDto {
 	private Double price;
 	private Long personalAccountId;
 	private PersonalAccountDto personalAccountDto;
-	
-	public DebitAccountDto() { }
 
 	public Long getId() {
 		return id;
