@@ -24,7 +24,7 @@ import br.com.rcosta.credit.services.CreditCardService;
 
 public class CreditCardControllerTest {
 
-	@InjectMocks
+    @InjectMocks
     private CreditCardController creditCardController;
 
     @Mock

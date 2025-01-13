@@ -30,7 +30,7 @@ import jakarta.persistence.EntityNotFoundException;
 @SpringBootTest
 public class CreditCardBillsServiceTest {
 
-	@InjectMocks
+    @InjectMocks
     private CreditCardBillsService creditCardBillsService;
 
     @Mock
@@ -80,7 +80,6 @@ public class CreditCardBillsServiceTest {
 
     @Test
     void addBills_ShouldReturnAddedBill() {
-        // Simula o comportamento do save
         when(modelMapper.map(creditCardBillsDto, CreditCardBillsModel.class)).thenReturn(new CreditCardBillsModel());
         when(modelMapper.map(any(CreditCardBillsModel.class), eq(CreditCardBillsDto.class))).thenReturn(creditCardBillsDto);
 
@@ -89,6 +88,15 @@ public class CreditCardBillsServiceTest {
         assertNotNull(result);
         assertEquals(creditCardBillsDto.getId(), result.getId());
         verify(creditCardBillsRepository, times(1)).save(any(CreditCardBillsModel.class));
+    }
+
+    @Test
+    void addBills_ShouldThrowEntityNotFoundException_WhenCreditCardNotFound() {
+        when(creditCardRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> {
+            creditCardBillsService.addBills(creditCardBillsDto);
+        });
     }
 
     @Test

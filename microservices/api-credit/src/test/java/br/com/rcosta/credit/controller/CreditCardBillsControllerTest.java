@@ -25,21 +25,18 @@ import jakarta.persistence.EntityNotFoundException;
 
 public class CreditCardBillsControllerTest {
 
-	@InjectMocks
+    @InjectMocks
     private CreditCardBillsController creditCardBillsController;
 
     @Mock
     private CreditCardBillsService creditCardBillsService;
-    
-    @Mock
-    private UriComponentsBuilder uriBuilder;
 
     private CreditCardBillsDto creditCardBillsDto;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        
+
         creditCardBillsDto = new CreditCardBillsDto();
         creditCardBillsDto.setId(1L);
         creditCardBillsDto.setName("Test Bill");
@@ -62,29 +59,19 @@ public class CreditCardBillsControllerTest {
 
     @Test
     void createBills_ShouldReturnCreatedStatus_WhenBillsAreCreated() {
-        // Mockando o comportamento do serviço
         List<CreditCardBillsDto> billsList = List.of(creditCardBillsDto);
         when(creditCardBillsService.addNewBills(any(), anyInt())).thenReturn(billsList);
 
-        // Mockando o comportamento do UriComponentsBuilder e UriComponents
-        // UriComponents uriComponents = UriComponentsBuilder.fromPath("/api/v1/bills/{id}").buildAndExpand(creditCardBillsDto.getId()); // Criando um UriComponents
+        ResponseEntity<List<CreditCardBillsDto>> response = creditCardBillsController.createBills(
+            creditCardBillsDto, 
+            1, 
+            UriComponentsBuilder.newInstance()
+        );
 
-//        // Simulando os métodos do UriComponentsBuilder
-//        when(uriBuilder.path("/api/v1/bills/{id}")).thenReturn(uriBuilder);
-//        when(uriBuilder.buildAndExpand(creditCardBillsDto.getId())).thenReturn(uriComponents);
-//
-//        // Simulando o comportamento de toUri() no UriComponents
-//        when(uriComponents.toUri()).thenReturn(uriComponents.toUri());
-
-        // Chama o método do controller passando o mock de UriComponentsBuilder
-        ResponseEntity<List<CreditCardBillsDto>> response = creditCardBillsController.createBills(creditCardBillsDto, 1, UriComponentsBuilder.newInstance());
-
-        // Verifica o status da resposta e o corpo
         assertNotNull(response);
         assertEquals(201, response.getStatusCode().value());
         assertEquals(billsList, response.getBody());
     }
-
 
     @Test
     void deleteBill_ShouldReturnNoContent_WhenBillDeletedSuccessfully() {

@@ -20,5 +20,11 @@ spring:
     enabled: true # Enable Java Management Extensions (JMX) for monitoring.
     mbean-domain: metrics # Set the JMX domain to "metrics".
 
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
 jar:
   name: api-credit # Name of the application's JAR file.

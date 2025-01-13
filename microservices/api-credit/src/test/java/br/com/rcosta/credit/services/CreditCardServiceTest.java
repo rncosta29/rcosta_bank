@@ -25,7 +25,7 @@ import jakarta.persistence.EntityNotFoundException;
 @SpringBootTest
 public class CreditCardServiceTest {
 
-	@InjectMocks
+    @InjectMocks
     private CreditCardService creditCardService;
 
     @Mock
@@ -43,17 +43,24 @@ public class CreditCardServiceTest {
     void testAllCreditsCard() {
         CreditCardModel model1 = new CreditCardModel(1L, "Visa");
         CreditCardModel model2 = new CreditCardModel(2L, "Mastercard");
+
         when(creditCardRepository.findAll()).thenReturn(Arrays.asList(model1, model2));
 
-        CreditCardDto dto1 = new CreditCardDto();
-        dto1.setId(1L);
-        dto1.setName("Visa");
-        CreditCardDto dto2 = new CreditCardDto();
-        dto2.setId(2L);
-        dto2.setName("Mastercard");
+        when(modelMapper.map(model1, CreditCardDto.class)).thenAnswer(invocation -> {
+            CreditCardModel argument = invocation.getArgument(0);
+            CreditCardDto dto = new CreditCardDto();
+            dto.setId(argument.getId());
+            dto.setName(argument.getName());
+            return dto;
+        });
 
-        when(modelMapper.map(model1, CreditCardDto.class)).thenReturn(dto1);
-        when(modelMapper.map(model2, CreditCardDto.class)).thenReturn(dto2);
+        when(modelMapper.map(model2, CreditCardDto.class)).thenAnswer(invocation -> {
+            CreditCardModel argument = invocation.getArgument(0);
+            CreditCardDto dto = new CreditCardDto();
+            dto.setId(argument.getId());
+            dto.setName(argument.getName());
+            return dto;
+        });
 
         List<CreditCardDto> result = creditCardService.allCreditsCard();
 
@@ -72,7 +79,13 @@ public class CreditCardServiceTest {
 
         when(modelMapper.map(dto, CreditCardModel.class)).thenReturn(model);
         when(creditCardRepository.save(model)).thenReturn(model);
-        when(modelMapper.map(model, CreditCardDto.class)).thenReturn(dto);
+        when(modelMapper.map(model, CreditCardDto.class)).thenAnswer(invocation -> {
+            CreditCardModel argument = invocation.getArgument(0);
+            CreditCardDto dtoResponse = new CreditCardDto();
+            dtoResponse.setId(argument.getId());
+            dtoResponse.setName(argument.getName());
+            return dtoResponse;
+        });
 
         CreditCardDto result = creditCardService.addCreditCard(dto);
 
@@ -85,11 +98,13 @@ public class CreditCardServiceTest {
         CreditCardModel model = new CreditCardModel(1L, "Visa");
         when(creditCardRepository.findById(1L)).thenReturn(Optional.of(model));
 
-        CreditCardDto dto = new CreditCardDto();
-        dto.setId(1L);
-        dto.setName("Visa");
-
-        when(modelMapper.map(model, CreditCardDto.class)).thenReturn(dto);
+        when(modelMapper.map(model, CreditCardDto.class)).thenAnswer(invocation -> {
+            CreditCardModel argument = invocation.getArgument(0);
+            CreditCardDto dto = new CreditCardDto();
+            dto.setId(argument.getId());
+            dto.setName(argument.getName());
+            return dto;
+        });
 
         CreditCardDto result = creditCardService.getCreditsCardById(1L);
 
