@@ -58,6 +58,17 @@ pipeline {
                 }
             }
         }
+		
+		stage('Gerando Jacoco Report para API Account') {
+			steps {
+				script {
+					echo "Gerando ralatório Jacoco para APi Account"
+					dir('microservices/api-account') {
+						sh './mvnw jacoco:report'
+					}
+				}
+			}
+		}
 
         stage('SonarQube Analysis API Account') {
             steps {
@@ -71,6 +82,7 @@ pipeline {
 							-Dsonar.projectVersion=1.0 \
 							-Dsonar.sources=src \
 							-Dsonar.java.binaries=target/classes \
+							-Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
 							-Dsonar.host.url=${SONAR_HOST_URL} \
 							-Dsonar.login=sqp_12eb4412f20a0bddd08525c08299061fbdc8a68f
 						"""
@@ -90,6 +102,17 @@ pipeline {
                 }
             }
         }
+		
+		stage('Gerando Jacoco Report para API Credit') {
+			steps {
+				script {
+					echo "Gerando ralatório Jacoco para APi Credit"
+					dir('microservices/api-credit') {
+						sh './mvnw jacoco:report'
+					}
+				}
+			}
+		}
 
         stage('SonarQube Analysis API Credit') {
             steps {
@@ -103,6 +126,7 @@ pipeline {
 							-Dsonar.projectVersion=1.0 \
 							-Dsonar.sources=src \
 							-Dsonar.java.binaries=target/classes \
+							-Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
 							-Dsonar.host.url=${SONAR_HOST_URL} \
 							-Dsonar.login=sqp_38351d60619d7b309c4a420f0e4406c7a107e9bf
 						"""
