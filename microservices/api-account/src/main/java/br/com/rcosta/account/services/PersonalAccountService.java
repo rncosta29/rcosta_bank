@@ -40,22 +40,24 @@ public class PersonalAccountService {
     }
 
     @Transactional
-	public DebitAccountDto addDebitToPersonalAccount(Long personalAccountId, DebitAccountDto debitDto) {
-	    PersonalAccountModel personalAccount = personalAccountRepository.findById(personalAccountId)
-	        .orElseThrow(() -> new EntityNotFoundException("Conta não encontrada."));
+    public DebitAccountDto addDebitToPersonalAccount(Long personalAccountId, DebitAccountDto debitDto) {
+        if (debitDto == null) {
+            throw new NullPointerException("O DTO de débito não pode ser nulo");
+        }
 
-	    Hibernate.initialize(personalAccount.getDebitAccounts());
+        PersonalAccountModel personalAccount = personalAccountRepository.findById(personalAccountId)
+                .orElseThrow(() -> new EntityNotFoundException("Conta não encontrada"));
 
-	    DebitAccountModel debit = modelMapper.map(debitDto, DebitAccountModel.class);
-	    debit.setPersonalAccount(personalAccount);
+        Hibernate.initialize(personalAccount.getDebitAccounts());
+        DebitAccountModel debit = modelMapper.map(debitDto, DebitAccountModel.class);
+        debit.setPersonalAccount(personalAccount);
+        debitAccountRepository.save(debit);
+        debitAccountRepository.flush();
+        personalAccount.updateBalance();
+        personalAccountRepository.save(personalAccount);
+        personalAccountRepository.flush();
+        
+        return modelMapper.map(debit, DebitAccountDto.class);
+    }
 
-	    debitAccountRepository.save(debit);
-	    debitAccountRepository.flush(); // Sincroniza imediatamente com o banco
-
-	    personalAccount.updateBalance();
-	    personalAccountRepository.save(personalAccount);
-	    personalAccountRepository.flush(); // Sincroniza o saldo atualizado
-
-	    return modelMapper.map(debit, DebitAccountDto.class);
-	}
 }
