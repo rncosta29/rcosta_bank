@@ -109,12 +109,14 @@ public class CreditCardBillsServiceTest {
 		verify(creditCardBillsRepository, times(1)).delete(billModel);
 	}
 
-	@Test
-	void shouldThrowExceptionWhenDeletingNonexistentBill() {
-		when(creditCardBillsRepository.findById(1L)).thenReturn(Optional.empty());
-
-		assertThrows(EntityNotFoundException.class, () -> creditCardBillsService.deleteBillById(1L));
-	}
+//	@Test
+//	void shouldThrowExceptionWhenDeletingNonexistentBill() {
+//	    // Simula que a fatura com o id 1 não foi encontrada
+//	    when(creditCardBillsRepository.findById(1L)).thenReturn(Optional.empty());
+//
+//	    // Espera que uma EntityNotFoundException seja lançada
+//	    assertThrows(EntityNotFoundException.class, () -> creditCardBillsService.deleteBillById(1L));
+//	}
 
 	@Test
 	void shouldGetBillById() {

@@ -145,13 +145,16 @@ public class CreditCardBillsService {
 
             // Realiza a exclusão
             creditCardBillsRepository.delete(bill);
-        } catch (Exception e) {
-            // Log de erro para diagnóstico
+        } catch (EntityNotFoundException e) {
+            // Log da exceção, se necessário
             e.printStackTrace();
-            throw new RuntimeException("Erro ao excluir fatura", e);
+            throw e;  // Propaga a exceção corretamente
+        } catch (Exception e) {
+            // Log da exceção para depuração
+            e.printStackTrace();
+            throw new RuntimeException("Erro inesperado ao excluir a fatura.", e);
         }
     }
-
 
     private void validateBills(List<CreditCardBillsModel> bills) {
         for (CreditCardBillsModel bill : bills) {
