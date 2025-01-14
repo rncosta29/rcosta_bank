@@ -115,6 +115,12 @@ public class CreditCardBillsService {
 
 	    // **Validações antes de salvar**
 	    validateBills(entities);
+	    
+	    entities.forEach(entity -> {
+	        if (entity.getPrice() == null) {
+	            throw new IllegalStateException("A entidade tem o preço nulo antes da persistência.");
+	        }
+	    });
 
 	    // **Persistência após validação**
 	    for (CreditCardBillsModel entity : entities) {

@@ -374,6 +374,9 @@ public class CreditCardBillsServiceTest {
         when(modelMapper.map(any(CreditCardBillsDto.class), eq(CreditCardBillsModel.class)))
             .thenAnswer(invocation -> {
                 CreditCardBillsDto dto = invocation.getArgument(0);
+                if (dto.getPrice() == null) {
+                    throw new IllegalArgumentException("O preço no DTO está nulo.");
+                }
                 return new CreditCardBillsModel(
                     null,
                     dto.getName(),
@@ -411,7 +414,11 @@ public class CreditCardBillsServiceTest {
         verify(creditCardBillsRepository, times(3)).save(any(CreditCardBillsModel.class));
 
         // Verifica que cada parcela tem o valor correto
-        result.forEach(parcel -> assertEquals(100.0, parcel.getPrice()));
+        result.forEach(parcel -> {
+            assertNotNull(parcel, "A parcela retornada é nula.");
+            assertNotNull(parcel.getPrice(), "O preço da parcela é nulo.");
+            assertEquals(100.0, parcel.getPrice());
+        });
     }
 
     @Test
