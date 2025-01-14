@@ -86,17 +86,14 @@ public class CreditCardBillsController {
 	    try {
 	        // Chama o serviço para excluir a fatura pelo ID
 	        creditCardBillsService.deleteBillById(id);
-
-	        // Retorna o status 204 (No Content) caso a exclusão seja bem-sucedida
 	        return ResponseEntity.noContent().build();
 	    } catch (EntityNotFoundException e) {
-	        // Retorna o status 404 (Not Found) caso a fatura não seja encontrada
+	        // Log da exceção para depuração
+	        e.printStackTrace();
 	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 	    } catch (Exception e) {
 	        // Log da exceção para depuração
 	        e.printStackTrace();
-
-	        // Retorna o status 500 (Internal Server Error) em caso de erro inesperado
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 	    }
 	}

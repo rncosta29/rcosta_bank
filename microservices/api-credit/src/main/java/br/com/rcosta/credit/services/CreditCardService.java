@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import br.com.rcosta.credit.dto.CreditCardBillsDto;
@@ -19,40 +20,40 @@ public class CreditCardService {
 
 	private CreditCardRepository creditCardRepository;
 	private CreditCardBillsRepository creditCardBillsRepository;
-	private ModelMapper modelMapper;
+	private final ModelMapper creditCardModelMapper;
 	
-	public CreditCardService(CreditCardRepository creditCardRepository, CreditCardBillsRepository creditCardBillsRepository, ModelMapper modelMapper) {
+	public CreditCardService(CreditCardRepository creditCardRepository, CreditCardBillsRepository creditCardBillsRepository, @Qualifier("creditCardModelMapper") ModelMapper creditCardModelMapper) {
 		this.creditCardBillsRepository = creditCardBillsRepository;
 		this.creditCardRepository = creditCardRepository;
-		this.modelMapper = modelMapper;
+		this.creditCardModelMapper = creditCardModelMapper;
 	}
 	
 	public List<CreditCardDto> allCreditsCard() {
-		List<CreditCardDto> listModel = creditCardRepository.findAll().stream().map(c -> modelMapper.map(c, CreditCardDto.class))
+		List<CreditCardDto> listModel = creditCardRepository.findAll().stream().map(c -> creditCardModelMapper.map(c, CreditCardDto.class))
 				.collect(Collectors.toList());
 		
 		for (CreditCardDto creditCardDto : listModel) {
 			List<CreditCardBillsModel> list = creditCardBillsRepository.findByCreditCardId(creditCardDto.getId());
-			creditCardDto.setCreditsCardDto(list.stream().map(dto -> modelMapper.map(dto, CreditCardBillsDto.class)).collect(Collectors.toList()));
+			creditCardDto.setCreditsCardDto(list.stream().map(dto -> creditCardModelMapper.map(dto, CreditCardBillsDto.class)).collect(Collectors.toList()));
 		}
 		
 		return listModel;
 	}
 	
 	public CreditCardDto addCreditCard(CreditCardDto dto) {
-		CreditCardModel model = modelMapper.map(dto, CreditCardModel.class);
+		CreditCardModel model = creditCardModelMapper.map(dto, CreditCardModel.class);
 		creditCardRepository.save(model);
 		
-		return modelMapper.map(model, CreditCardDto.class);
+		return creditCardModelMapper.map(model, CreditCardDto.class);
 	}
 	
 	public CreditCardDto getCreditsCardById(Long id) {
 		CreditCardModel model =  creditCardRepository.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException());
 		List<CreditCardBillsModel> list = creditCardBillsRepository.findByCreditCardId(id);
-		CreditCardDto newModel = modelMapper.map(model, CreditCardDto.class);
+		CreditCardDto newModel = creditCardModelMapper.map(model, CreditCardDto.class);
 		
-		newModel.setCreditsCardDto(list.stream().map(dto -> modelMapper.map(dto, CreditCardBillsDto.class)).collect(Collectors.toList()));
+		newModel.setCreditsCardDto(list.stream().map(dto -> creditCardModelMapper.map(dto, CreditCardBillsDto.class)).collect(Collectors.toList()));
 		
 		return newModel;
 	}

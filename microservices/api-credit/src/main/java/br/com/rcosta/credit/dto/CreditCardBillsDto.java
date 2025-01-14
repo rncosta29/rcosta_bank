@@ -88,6 +88,12 @@ public class CreditCardBillsDto {
 	public void setCreditCardId(Long creditCardId) {
 		this.creditCardId = creditCardId;
 	}
+	
+    public void setPriceWithParcelDivision(int quantity) {
+        if (quantity > 0) {
+            this.price = this.price / quantity;  // Atualiza o preço para cada parcela
+        }
+    }
 
 	@Override
 	public int hashCode() {

@@ -118,6 +118,12 @@ public class CreditCardBillsModel implements Serializable {
 	public void setCreditCard(CreditCardModel creditCard) {
 		this.creditCard = creditCard;
 	}
+	
+	public void setPriceWithParcelDivision(int quantity) {
+		if (quantity > 0) {
+			this.price = this.price / quantity;  // Atualiza o preço para cada parcela
+		}
+	}
 
 	@Override
 	public int hashCode() {
