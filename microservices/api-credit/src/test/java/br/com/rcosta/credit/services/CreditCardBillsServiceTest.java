@@ -324,22 +324,36 @@ public class CreditCardBillsServiceTest {
         CreditCardBillsDto billDto = new CreditCardBillsDto();
         billDto.setCreditCardId(1L);
         billDto.setIsParcel(false);
-        
+        billDto.setPrice(100.0); // Adicionar o preço para evitar valores nulos
+        billDto.setName("Test Bill");
+        billDto.setPaymentMonth(1);
+        billDto.setPaymentYear(2025);
+
         CreditCardModel creditCardModel = new CreditCardModel(1L, "Test Credit Card");
-        CreditCardBillsModel billModel = new CreditCardBillsModel(1L, "Test Bill", LocalDate.now(), 1, 2025, 100.0, false, creditCardModel);
-        
+        CreditCardBillsModel billModel = new CreditCardBillsModel();
+        billModel.setId(1L);
+        billModel.setName("Test Bill");
+        billModel.setPrice(100.0); // Certifique-se de que o preço está configurado
+        billModel.setIsParcel(false);
+        billModel.setPaymentMonth(1);
+        billModel.setPaymentYear(2025);
+        billModel.setCreditCard(creditCardModel);
+
         when(creditCardRepository.findById(1L)).thenReturn(Optional.of(creditCardModel));
         when(modelMapper.map(billDto, CreditCardBillsModel.class)).thenReturn(billModel);
         when(modelMapper.map(billModel, CreditCardBillsDto.class)).thenReturn(billDto);
+        when(creditCardBillsRepository.save(any(CreditCardBillsModel.class))).thenReturn(billModel);
 
         // Act
         List<CreditCardBillsDto> result = creditCardBillsService.addNewBills(billDto, 1);
 
         // Assert
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(creditCardBillsRepository, times(1)).save(billModel);
+        assertNotNull(result, "O resultado não deve ser nulo.");
+        assertEquals(1, result.size(), "O número de faturas deve ser 1.");
+        assertEquals(100.0, result.get(0).getPrice(), "O preço da fatura está incorreto.");
+        verify(creditCardBillsRepository, times(1)).save(any(CreditCardBillsModel.class));
     }
+
 
     @Test
     void shouldAddParcelBills() {
@@ -349,6 +363,7 @@ public class CreditCardBillsServiceTest {
         billDto.setIsParcel(true);
         billDto.setPaymentMonth(12);
         billDto.setPaymentYear(2025);
+        billDto.setPrice(300.0); // Valor total da fatura
 
         CreditCardModel creditCardModel = new CreditCardModel(1L, "Test Credit Card");
 
@@ -394,8 +409,10 @@ public class CreditCardBillsServiceTest {
 
         // Verifica que o repositório salvou as parcelas corretamente
         verify(creditCardBillsRepository, times(3)).save(any(CreditCardBillsModel.class));
-    }
 
+        // Verifica que cada parcela tem o valor correto
+        result.forEach(parcel -> assertEquals(100.0, parcel.getPrice()));
+    }
 
     @Test
     void shouldNotDeleteBillIfNotFound() {

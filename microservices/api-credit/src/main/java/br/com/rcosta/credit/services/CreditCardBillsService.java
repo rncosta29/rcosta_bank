@@ -72,6 +72,10 @@ public class CreditCardBillsService {
 	        // Recupera o cartão de crédito
 	        CreditCardModel creditCardModel = creditCardRepository.findById(model.getCreditCardId())
 	                                                               .orElseThrow(() -> new RuntimeException("Cartão de crédito não encontrado"));
+	        
+	        if (model.getPrice() == null) {
+	            throw new IllegalArgumentException("O preço informado é inválido.");
+	        }
 
 	        for (int i = 0; i < quantity; i++) {
 	            if (paymentMonth > 12) {
@@ -139,10 +143,6 @@ public class CreditCardBillsService {
 	        if (bill.getPaymentMonth() < 1 || bill.getPaymentMonth() > 12) {
 	            throw new IllegalArgumentException("O mês de pagamento deve estar entre 1 e 12.");
 	        }
-	        if (bill.getPaymentYear() < 2023) { // Exemplo de ano mínimo
-	            throw new IllegalArgumentException("O ano de pagamento é inválido.");
-	        }
 	    }
 	}
-
 }
