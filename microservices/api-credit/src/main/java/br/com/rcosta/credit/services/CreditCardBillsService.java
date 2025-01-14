@@ -62,17 +62,17 @@ public class CreditCardBillsService {
 	}
 	
 	public List<CreditCardBillsDto> addNewBills(CreditCardBillsDto model, Integer quantity) {
-	    List<CreditCardBillsDto> savedBills = new ArrayList<>();  // Lista para armazenar os DTOs das parcelas
+	    List<CreditCardBillsModel> entities = new ArrayList<>();
+	    List<CreditCardBillsDto> result = new ArrayList<>();
 
 	    if (model.getIsParcel()) {
 	        int paymentMonth = model.getPaymentMonth();
 	        int paymentYear = model.getPaymentYear();
-	        
-	        // Garanta que o CreditCardModel esteja gerenciado
+
+	        // Recupera o cartão de crédito
 	        CreditCardModel creditCardModel = creditCardRepository.findById(model.getCreditCardId())
 	                                                               .orElseThrow(() -> new RuntimeException("Cartão de crédito não encontrado"));
 
-	        // Cria as parcelas
 	        for (int i = 0; i < quantity; i++) {
 	            if (paymentMonth > 12) {
 	                paymentMonth = 1;
@@ -80,51 +80,47 @@ public class CreditCardBillsService {
 	            }
 
 	            // Cria a nova parcela
-	            CreditCardBillsDto parcel = new CreditCardBillsDto();
-	            parcel.setName(model.getName());
-	            parcel.setPrice(model.getPrice());  // Divide o valor total pela quantidade de parcelas
-	            parcel.setIsParcel(true);
-	            parcel.setPaymentMonth(paymentMonth);
-	            parcel.setPaymentYear(paymentYear);
-	            parcel.setCreditCardId(model.getCreditCardId());
-	            parcel.setCreditCardDto(model.getCreditCardDto());
+	            CreditCardBillsModel entity = new CreditCardBillsModel();
+	            entity.setName(model.getName());
+	            entity.setPrice(model.getPrice() / quantity);
+	            entity.setIsParcel(true);
+	            entity.setPaymentMonth(paymentMonth);
+	            entity.setPaymentYear(paymentYear);
+	            entity.setCreditCard(creditCardModel);
 
-	            // Usa a data recebida no modelo (não define uma data nova)
-	            parcel.setDate(model.getDate());  // Configura a data vinda da requisição
+	            entities.add(entity);
 
-	            // Mapeia o dto para o modelo e associa o CreditCardModel gerenciado
-	            CreditCardBillsModel entity = modelMapper.map(parcel, CreditCardBillsModel.class);
-	            entity.setCreditCard(creditCardModel); // Garantir que o CreditCardModel esteja associado
-
-	            // Salva a parcela
-	            creditCardBillsRepository.save(entity);
-
-	            // Adiciona o DTO da parcela salva à lista
-	            CreditCardBillsDto savedParcelDto = modelMapper.map(entity, CreditCardBillsDto.class);
-	            savedBills.add(savedParcelDto);
-
-	            // Incrementa o mês para a próxima parcela
+	            // Incrementa o mês
 	            paymentMonth++;
 	        }
 	    } else {
-	        // Se não for parcelado, salva a fatura normalmente
 	        CreditCardModel creditCardModel = creditCardRepository.findById(model.getCreditCardId())
 	                                                               .orElseThrow(() -> new RuntimeException("Cartão de crédito não encontrado"));
-	        CreditCardBillsModel entity = modelMapper.map(model, CreditCardBillsModel.class);
+
+	        // Cria a fatura única
+	        CreditCardBillsModel entity = new CreditCardBillsModel();
+	        entity.setName(model.getName());
+	        entity.setPrice(model.getPrice());
+	        entity.setIsParcel(false);
+	        entity.setPaymentMonth(model.getPaymentMonth());
+	        entity.setPaymentYear(model.getPaymentYear());
 	        entity.setCreditCard(creditCardModel);
 
-	        // Usa a data recebida no modelo (não define uma data nova)
-	        entity.setDate(model.getDate());  // Configura a data vinda da requisição
-
-	        creditCardBillsRepository.save(entity);
-
-	        // Adiciona o DTO da fatura não parcelada à lista
-	        CreditCardBillsDto savedBillDto = modelMapper.map(entity, CreditCardBillsDto.class);
-	        savedBills.add(savedBillDto);
+	        entities.add(entity);
 	    }
 
-	    return savedBills;  // Retorna a lista com todos os DTOs das parcelas salvas
+	    // **Validações antes de salvar**
+	    validateBills(entities);
+
+	    // **Persistência após validação**
+	    for (CreditCardBillsModel entity : entities) {
+	        CreditCardBillsModel savedEntity = creditCardBillsRepository.save(entity);
+	        result.add(modelMapper.map(savedEntity, CreditCardBillsDto.class));
+	    }
+
+	    return result;
 	}
+
 	
 	public void deleteBillById(Long id) {
 	    // Verifica se a fatura existe antes de deletar
@@ -134,4 +130,19 @@ public class CreditCardBillsService {
 	    // Realiza a exclusão
 	    creditCardBillsRepository.delete(bill);
 	}
+	
+	private void validateBills(List<CreditCardBillsModel> bills) {
+	    for (CreditCardBillsModel bill : bills) {
+	        if (bill.getPrice() <= 0) {
+	            throw new IllegalArgumentException("O valor da parcela deve ser maior que zero.");
+	        }
+	        if (bill.getPaymentMonth() < 1 || bill.getPaymentMonth() > 12) {
+	            throw new IllegalArgumentException("O mês de pagamento deve estar entre 1 e 12.");
+	        }
+	        if (bill.getPaymentYear() < 2023) { // Exemplo de ano mínimo
+	            throw new IllegalArgumentException("O ano de pagamento é inválido.");
+	        }
+	    }
+	}
+
 }

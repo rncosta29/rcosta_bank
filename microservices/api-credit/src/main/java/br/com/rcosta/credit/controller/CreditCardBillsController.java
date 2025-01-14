@@ -44,6 +44,10 @@ public class CreditCardBillsController {
 	    try {
 	        // Chama o serviço para criar as faturas (parceladas ou não)
 	        List<CreditCardBillsDto> list = creditCardBillsService.addNewBills(dto, quantity);
+	        
+	        if (list.isEmpty() || list.get(0).getId() == null) {
+	            return ResponseEntity.badRequest().build();
+	        }
 
 	        // Cria a URI para o primeiro item da lista de faturas (você pode modificar para outro item, conforme necessário)
 	        URI address = uriBuilder.path("/api/v1/bills/{id}").buildAndExpand(list.get(0).getId()).toUri();
@@ -62,9 +66,12 @@ public class CreditCardBillsController {
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<CreditCardBillsDto> findBillsById(@PathVariable Long id) {
-		CreditCardBillsDto dto = creditCardBillsService.getBillsById(id);
-		
-		return ResponseEntity.ok(dto);
+	    try {
+	        CreditCardBillsDto dto = creditCardBillsService.getBillsById(id);
+	        return ResponseEntity.ok(dto);
+	    } catch (EntityNotFoundException ex) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	    }
 	}
 	
 	@GetMapping("/creditCardId/{id}")

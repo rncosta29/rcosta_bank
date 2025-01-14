@@ -1,6 +1,7 @@
 package br.com.rcosta.credit.dto;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class CreditCardBillsDto {
 
@@ -86,5 +87,26 @@ public class CreditCardBillsDto {
 
 	public void setCreditCardId(Long creditCardId) {
 		this.creditCardId = creditCardId;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(creditCardDto, creditCardId, date, id, isParcel, name, paymentMonth, paymentYear, price);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CreditCardBillsDto other = (CreditCardBillsDto) obj;
+		return Objects.equals(creditCardDto, other.creditCardDto) && Objects.equals(creditCardId, other.creditCardId)
+				&& Objects.equals(date, other.date) && Objects.equals(id, other.id)
+				&& Objects.equals(isParcel, other.isParcel) && Objects.equals(name, other.name)
+				&& Objects.equals(paymentMonth, other.paymentMonth) && Objects.equals(paymentYear, other.paymentYear)
+				&& Objects.equals(price, other.price);
 	}
 }

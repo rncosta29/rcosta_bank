@@ -181,21 +181,25 @@ public class CreditCardBillsControllerTest {
     @Test
     void createBills_ShouldGenerateCorrectURI_WhenBillsAreCreated() {
         // Arrange
-        List<CreditCardBillsDto> billsList = List.of(creditCardBillsDto);
+        CreditCardBillsDto mockDto = new CreditCardBillsDto();
+        mockDto.setId(1L);  // Configura o ID esperado para a validação do teste
+
+        List<CreditCardBillsDto> billsList = List.of(mockDto);
         when(creditCardBillsService.addNewBills(any(), anyInt())).thenReturn(billsList);
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance();
 
         // Act
         ResponseEntity<List<CreditCardBillsDto>> response = creditCardBillsController.createBills(
-            creditCardBillsDto, 
-            1, 
+            mockDto,
+            1,
             uriBuilder
         );
 
         // Assert
         assertNotNull(response);
         assertEquals(201, response.getStatusCode().value());
-        assertEquals("/api/v1/bills/1", uriBuilder.build().toUriString());  // Verifica a URI gerada
+        assertEquals("/api/v1/bills/1", response.getHeaders().getLocation().toString()); // Verifica a URI do cabeçalho 'Location'
     }
+
 }
