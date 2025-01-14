@@ -3,12 +3,11 @@ package br.com.rcosta.credit.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.eq;
-import org.mockito.ArgumentCaptor;
-import static org.mockito.ArgumentMatchers.any;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,6 +15,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
@@ -201,6 +201,17 @@ public class CreditCardBillsServiceTest {
         CreditCardModel creditCardModel = new CreditCardModel(1L, "Test Credit Card");
         when(creditCardRepository.findById(1L)).thenReturn(Optional.of(creditCardModel));
         when(creditCardBillsRepository.save(any(CreditCardBillsModel.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(modelMapper.map(any(CreditCardBillsModel.class), eq(CreditCardBillsDto.class)))
+            .thenAnswer(invocation -> {
+                CreditCardBillsModel model = invocation.getArgument(0);
+                CreditCardBillsDto dto = new CreditCardBillsDto();
+                dto.setName(model.getName());
+                dto.setPrice(model.getPrice());
+                dto.setPaymentMonth(model.getPaymentMonth());
+                dto.setPaymentYear(model.getPaymentYear());
+                dto.setCreditCardId(model.getCreditCard().getId());
+                return dto;
+            });
 
         // Captura o argumento passado para save
         ArgumentCaptor<CreditCardBillsModel> captor = ArgumentCaptor.forClass(CreditCardBillsModel.class);
@@ -209,20 +220,22 @@ public class CreditCardBillsServiceTest {
         List<CreditCardBillsDto> result = creditCardBillsService.addNewBills(billDto, 3);
 
         // Assert
-        assertNotNull(result);
-        assertEquals(3, result.size());
-        result.forEach(parcel -> assertEquals(100.0, parcel.getPrice()));
+        assertNotNull(result, "O resultado não pode ser nulo.");
+        assertEquals(3, result.size(), "O número de parcelas deve ser igual à quantidade esperada.");
+        result.forEach(parcel -> {
+            assertNotNull(parcel, "Cada parcela deve ser preenchida.");
+            assertEquals(100.0, parcel.getPrice(), "O preço de cada parcela está incorreto.");
+        });
 
         // Verificar se save foi chamado com um CreditCardBillsModel válido
         verify(creditCardBillsRepository, times(3)).save(captor.capture());
 
         // Verificar que as parcelas foram passadas corretamente
         captor.getAllValues().forEach(parcel -> {
-            assertNotNull(parcel.getCreditCard());
+            assertNotNull(parcel.getCreditCard(), "O cartão de crédito deve estar associado à parcela.");
             assertEquals(creditCardModel.getId(), parcel.getCreditCard().getId());
         });
     }
-
     
     @Test
     void shouldMapEntityToDtoCorrectlyWhenAddingBill() {
@@ -281,11 +294,14 @@ public class CreditCardBillsServiceTest {
     void shouldReturnSortedBillsByPaymentYear() {
         // Arrange
         CreditCardBillsModel bill1 = new CreditCardBillsModel(1L, "Bill 1", LocalDate.now(), 5, 2025, 100.0, false, new CreditCardModel());
-        CreditCardBillsModel bill2 = new CreditCardBillsModel(2L, "Bill 2", LocalDate.now(), 10, 2025, 100.0, false, new CreditCardModel());
-        when(creditCardBillsRepository.findByCreditCardId(1L)).thenReturn(List.of(bill2, bill1));
+        CreditCardBillsModel bill2 = new CreditCardBillsModel(2L, "Bill 2", LocalDate.now(), 10, 2023, 100.0, false, new CreditCardModel());
+        when(creditCardBillsRepository.findByCreditCardId(1L)).thenReturn(List.of(bill1, bill2));
         
         CreditCardBillsDto billDto1 = new CreditCardBillsDto();
+        billDto1.setPaymentYear(2025);
         CreditCardBillsDto billDto2 = new CreditCardBillsDto();
+        billDto2.setPaymentYear(2023);
+        
         when(modelMapper.map(bill1, CreditCardBillsDto.class)).thenReturn(billDto1);
         when(modelMapper.map(bill2, CreditCardBillsDto.class)).thenReturn(billDto2);
 
@@ -295,10 +311,12 @@ public class CreditCardBillsServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertEquals(billDto1, result.get(0).getPaymentYear()); // Verifica que billDto1 é o primeiro devido à ordenação
-        assertEquals(billDto2, result.get(1).getPaymentYear()); // Verifica que billDto2 é o segundo
+        assertEquals(2023, result.get(0).getPaymentYear()); // Verifica que o primeiro é de 2023
+        assertEquals(2025, result.get(1).getPaymentYear()); // Verifica que o segundo é de 2025
         verify(creditCardBillsRepository, times(1)).findByCreditCardId(1L);
     }
+
+
 
     @Test
     void shouldAddNonParcelBill() {
