@@ -8,7 +8,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import br.com.rcosta.credit.dto.CreditCardBillsDto;
@@ -25,6 +28,8 @@ public class CreditCardBillsService {
     private CreditCardBillsRepository creditCardBillsRepository;
     private CreditCardRepository creditCardRepository;
     private final ModelMapper creditCardBillsModelMapper;
+    
+    private static final Logger logger = LoggerFactory.getLogger(CreditCardBillsService.class);
 
     public CreditCardBillsService(CreditCardBillsRepository creditCardBillsRepository, 
                                   CreditCardRepository creditCardRepository, 
@@ -153,12 +158,16 @@ public class CreditCardBillsService {
             // Realiza a exclusão
             creditCardBillsRepository.delete(bill);
         } catch (EntityNotFoundException e) {
-            // Log da exceção, se necessário
-            e.printStackTrace();
-            throw e;  // Propaga a exceção corretamente
+            // Loga a exceção específica de entidade não encontrada
+            logger.error("Erro ao tentar excluir a fatura com id {}: {}", id, e.getMessage(), e);
+            throw e;  // Propaga a exceção
+        } catch (DataAccessException e) {
+            // Loga erros específicos relacionados ao acesso ao banco de dados, se necessário
+            logger.error("Erro ao acessar o banco de dados ao tentar excluir a fatura com id {}: {}", id, e.getMessage(), e);
+            throw e;  // Propaga a exceção
         } catch (Exception e) {
-            // Log da exceção para depuração
-            e.printStackTrace();
+        	// Log de erro geral para exceções inesperadas
+            logger.error("Erro inesperado ao excluir a fatura com id {}: {}", id, e.getMessage(), e);
             throw new RuntimeException("Erro inesperado ao excluir a fatura.", e);
         }
     }
