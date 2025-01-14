@@ -9,7 +9,12 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +22,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.rcosta.credit.dto.CreditCardBillsDto;
@@ -31,22 +40,72 @@ public class CreditCardBillsControllerTest {
 
     @Mock
     private CreditCardBillsService creditCardBillsService;
+    
+    @Autowired
+    private MockMvc mockMvc;
 
     private CreditCardBillsDto creditCardBillsDto;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-
+        mockMvc = MockMvcBuilders.standaloneSetup(creditCardBillsController).build();
+        
+        // Inicialização do objeto creditCardBillsDto antes de usá-lo nos testes
         creditCardBillsDto = new CreditCardBillsDto();
         creditCardBillsDto.setId(1L);
-        creditCardBillsDto.setName("Test Bill");
         creditCardBillsDto.setPrice(100.0);
-        creditCardBillsDto.setIsParcel(false);
-        creditCardBillsDto.setPaymentMonth(1);
+        creditCardBillsDto.setPaymentMonth(12);
         creditCardBillsDto.setPaymentYear(2025);
+        creditCardBillsDto.setName("Test Bill");
+        creditCardBillsDto.setIsParcel(true);
+    }
+    
+    @Test
+    void shouldCreateBills() throws Exception {
+        // Arrange
+        CreditCardBillsDto billDto = new CreditCardBillsDto();
+        billDto.setId(1L);  // Definindo um ID para o mock
+        List<CreditCardBillsDto> bills = Arrays.asList(billDto);
+
+        when(creditCardBillsService.addNewBills(any(), anyInt())).thenReturn(bills);
+        
+        // Mock da criação da URI na resposta do controller
+        when(creditCardBillsService.addNewBills(any(), anyInt())).thenReturn(bills);
+
+        // Act & Assert
+        mockMvc.perform(post("/api/v1/bills/insert/2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"creditCardId\": 1, \"price\": 300.0, \"isParcel\": true, \"paymentMonth\": 12, \"paymentYear\": 2025, \"name\": \"Test Bill\"}"))
+            .andExpect(status().isCreated())
+            .andExpect(header().string("Location", "http://localhost/api/v1/bills/1"))
+            .andExpect(jsonPath("$[0].id").value(1L));
     }
 
+    @Test
+    void shouldReturnBadRequestWhenBillsCreationFails() throws Exception {
+        // Arrange
+        when(creditCardBillsService.addNewBills(any(), anyInt())).thenReturn(Arrays.asList());
+
+        // Act & Assert
+        mockMvc.perform(post("/api/v1/bills/insert/2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"creditCardId\": 1, \"price\": 300.0, \"isParcel\": true, \"paymentMonth\": 12, \"paymentYear\": 2025, \"name\": \"Test Bill\"}"))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnInternalServerErrorWhenExceptionOccurs() throws Exception {
+        // Arrange
+        when(creditCardBillsService.addNewBills(any(), anyInt())).thenThrow(new RuntimeException("Erro inesperado"));
+
+        // Act & Assert
+        mockMvc.perform(post("/api/v1/bills/insert/2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"creditCardId\": 1, \"price\": 300.0, \"isParcel\": true, \"paymentMonth\": 12, \"paymentYear\": 2025, \"name\": \"Test Bill\"}"))
+            .andExpect(status().isInternalServerError());
+    }
+    
     @Test
     void findAllBills_ShouldReturnListOfBills() {
         when(creditCardBillsService.allBills()).thenReturn(List.of(creditCardBillsDto));
@@ -106,24 +165,7 @@ public class CreditCardBillsControllerTest {
         assertTrue(response.getBody().isEmpty());
     }
 
-//    @Test
-//    void createBills_ShouldReturnInternalServerError_WhenExceptionOccurs() {
-//        // Arrange
-//        when(creditCardBillsService.addNewBills(any(), anyInt()))
-//            .thenThrow(new RuntimeException("Unexpected error"));
-//
-//        // Act
-//        ResponseEntity<List<CreditCardBillsDto>> response = creditCardBillsController.createBills(
-//            creditCardBillsDto, 
-//            1, 
-//            UriComponentsBuilder.newInstance()
-//        );
-//
-//        // Assert
-//        assertNotNull(response);
-//        assertEquals(500, response.getStatusCode().value());
-//        assertEquals(null, response.getBody());
-//    }
+
 
     @Test
     void findBillsById_ShouldReturnBill_WhenFound() {

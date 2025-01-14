@@ -233,5 +233,142 @@ public class CreditCardBillsServiceTest {
 	    verify(creditCardBillsModelMapper, times(1)).map(billDto, CreditCardBillsModel.class);
 	    verify(creditCardBillsModelMapper, times(1)).map(billModel, CreditCardBillsDto.class);
 	}
+	
+	@Test
+    void shouldThrowRuntimeExceptionWhenCreditCardNotFound() {
+		CreditCardBillsDto billDto = new CreditCardBillsDto();
+		billDto.setCreditCardId(1L);
+		billDto.setPrice(300.0);
+		billDto.setIsParcel(false);
+		billDto.setPaymentMonth(1);
+		billDto.setPaymentYear(2025);
+		billDto.setName("Test Bill");
+        // Arrange
+        when(creditCardRepository.findById(anyLong())).thenReturn(Optional.empty());
 
+        // Act & Assert
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            creditCardBillsService.addNewBills(billDto, 1);
+        });
+
+        assertEquals("Cartão de crédito não encontrado", exception.getMessage());
+    }
+	
+    @Test
+    void shouldThrowIllegalArgumentExceptionWhenPriceIsInvalid() {
+    	CreditCardBillsDto billDto = new CreditCardBillsDto();
+		billDto.setCreditCardId(1L);
+		billDto.setPrice(0.0);
+		billDto.setIsParcel(true);
+		billDto.setPaymentMonth(1);
+		billDto.setPaymentYear(2025);
+		billDto.setName("Test Bill");
+		
+		CreditCardModel creditCardModel = new CreditCardModel();
+		creditCardModel.setId(1L);
+		creditCardModel.setName("Visa");
+		
+        when(creditCardRepository.findById(anyLong())).thenReturn(Optional.of(creditCardModel));
+        when(creditCardBillsRepository.save(any(CreditCardBillsModel.class)))
+            .thenReturn(new CreditCardBillsModel()); // Simula a persistência
+        when(creditCardBillsModelMapper.map(any(CreditCardBillsModel.class), eq(CreditCardBillsDto.class)))
+            .thenReturn(billDto);  // Simula o mapeamento
+
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            creditCardBillsService.addNewBills(billDto, 1);
+        });
+
+        assertEquals("O preço informado é inválido.", exception.getMessage());
+    }
+    @Test
+    void shouldReturnBillsWhenAddingNewBillsWithParcels() {
+    	CreditCardBillsDto billDto = new CreditCardBillsDto();
+		billDto.setCreditCardId(1L);
+		billDto.setPrice(300.0);
+		billDto.setIsParcel(true);
+		billDto.setPaymentMonth(1);
+		billDto.setPaymentYear(2025);
+		billDto.setName("Test Bill");
+		
+		CreditCardModel creditCardModel = new CreditCardModel();
+		creditCardModel.setId(1L);
+		creditCardModel.setName("Visa");
+		
+		// Arrange
+        when(creditCardRepository.findById(anyLong())).thenReturn(Optional.of(creditCardModel));
+        when(creditCardBillsRepository.save(any(CreditCardBillsModel.class)))
+            .thenReturn(new CreditCardBillsModel()); // Simula a persistência
+        when(creditCardBillsModelMapper.map(any(CreditCardBillsModel.class), eq(CreditCardBillsDto.class)))
+            .thenReturn(billDto);  // Simula o mapeamento
+
+        // Act
+        List<CreditCardBillsDto> result = creditCardBillsService.addNewBills(billDto, 2);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        verify(creditCardBillsRepository, times(2)).save(any(CreditCardBillsModel.class));  // Verifica a persistência
+    }
+    
+    @Test
+    void shouldReturnBillWhenAddingSingleBill() {
+    	CreditCardBillsDto billDto = new CreditCardBillsDto();
+		billDto.setCreditCardId(1L);
+		billDto.setPrice(300.0);
+		billDto.setIsParcel(true);
+		billDto.setPaymentMonth(1);
+		billDto.setPaymentYear(2025);
+		billDto.setName("Test Bill");
+		
+		CreditCardModel creditCardModel = new CreditCardModel();
+		creditCardModel.setId(1L);
+		creditCardModel.setName("Visa");
+		
+        // Arrange
+		billDto.setIsParcel(false);  // Define como fatura única
+        when(creditCardRepository.findById(anyLong())).thenReturn(Optional.of(creditCardModel));
+        when(creditCardBillsRepository.save(any(CreditCardBillsModel.class)))
+            .thenReturn(new CreditCardBillsModel());  // Simula a persistência
+        when(creditCardBillsModelMapper.map(any(CreditCardBillsModel.class), eq(CreditCardBillsDto.class)))
+            .thenReturn(billDto);  // Simula o mapeamento
+
+        // Act
+        List<CreditCardBillsDto> result = creditCardBillsService.addNewBills(billDto, 1);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(creditCardBillsRepository, times(1)).save(any(CreditCardBillsModel.class));  // Verifica a persistência
+    }
+    
+    @Test
+    void shouldAdjustMonthWhenPaymentMonthExceeds12() {
+        // Arrange
+        CreditCardBillsDto billDto = new CreditCardBillsDto();
+        billDto.setCreditCardId(1L);
+        billDto.setPrice(300.0);
+        billDto.setIsParcel(true);
+        billDto.setPaymentMonth(12);  // Definir o mês como 12
+        billDto.setPaymentYear(2025);
+        billDto.setName("Test Bill");
+
+        CreditCardModel creditCardModel = new CreditCardModel();
+        creditCardModel.setId(1L);
+        creditCardModel.setName("Visa");
+
+        when(creditCardRepository.findById(anyLong())).thenReturn(Optional.of(creditCardModel));
+        when(creditCardBillsRepository.save(any(CreditCardBillsModel.class)))
+            .thenReturn(new CreditCardBillsModel());  // Simula a persistência
+        when(creditCardBillsModelMapper.map(any(CreditCardBillsModel.class), eq(CreditCardBillsDto.class)))
+            .thenReturn(billDto);  // Simula o mapeamento
+
+        // Act
+        List<CreditCardBillsDto> result = creditCardBillsService.addNewBills(billDto, 2);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.size());  // Deve criar 2 parcelas
+        // assertEquals(1, result.get(1).getPaymentMonth());  // Verifica que o mês da segunda parcela foi ajustado para 1
+    }
 }

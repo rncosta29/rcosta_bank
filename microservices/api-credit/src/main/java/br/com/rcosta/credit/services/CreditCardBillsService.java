@@ -71,7 +71,7 @@ public class CreditCardBillsService {
         List<CreditCardBillsModel> entities = new ArrayList<>();
         List<CreditCardBillsDto> result = new ArrayList<>();
 
-        if (model.getIsParcel()) {
+        if (model.getIsParcel() == true) {
             int paymentMonth = model.getPaymentMonth();
             int paymentYear = model.getPaymentYear();
 
@@ -98,14 +98,20 @@ public class CreditCardBillsService {
                 entity.setPaymentMonth(paymentMonth);
                 entity.setPaymentYear(paymentYear);
                 entity.setCreditCard(creditCardModel);
-
-                System.out.println("Entidade criada: " + entity);
+                entity.setDate(model.getDate());
 
                 entities.add(entity);
 
                 // Incrementa o mês
                 paymentMonth++;
+
+                // Ajusta o mês após o incremento
+                if (paymentMonth > 12) {
+                    paymentMonth = 1;
+                    paymentYear++;
+                }
             }
+
         } else {
             CreditCardModel creditCardModel = creditCardRepository.findById(model.getCreditCardId())
                     .orElseThrow(() -> new RuntimeException("Cartão de crédito não encontrado"));
@@ -118,6 +124,7 @@ public class CreditCardBillsService {
             entity.setPaymentMonth(model.getPaymentMonth());
             entity.setPaymentYear(model.getPaymentYear());
             entity.setCreditCard(creditCardModel);
+            entity.setDate(model.getDate());
 
             entities.add(entity);
         }
@@ -127,7 +134,7 @@ public class CreditCardBillsService {
 
         // **Persistência após validação**
         for (CreditCardBillsModel entity : entities) {
-            if (entity.getPrice() == null) {
+            if (entity.getPrice() == null || model.getPrice() <= 0) {
                 throw new IllegalStateException("A entidade tem o preço nulo antes da persistência.");
             }
             CreditCardBillsModel savedEntity = creditCardBillsRepository.save(entity);

@@ -3,6 +3,8 @@ package br.com.rcosta.credit.controller;
 import java.net.URI;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -25,6 +27,8 @@ import jakarta.persistence.EntityNotFoundException;
 public class CreditCardBillsController {
 
 	private CreditCardBillsService creditCardBillsService;
+	
+	private static final Logger logger = LoggerFactory.getLogger(CreditCardBillsController.class);
 	
 	public CreditCardBillsController(CreditCardBillsService creditCardBillsService) {
 		this.creditCardBillsService = creditCardBillsService;
@@ -93,9 +97,10 @@ public class CreditCardBillsController {
 	        // Retorna o status 404 (Not Found) caso a fatura não seja encontrada
 	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 	    } catch (Exception e) {
-	        System.err.println("Erro inesperado: " + e.getMessage());
-	        e.printStackTrace();  // Exibe o stack trace para depuração
-	        throw e;  // Repita a exceção caso você precise investigar mais
-	    }
+            // Substitui o System.err por um logger
+            logger.error("Erro inesperado ao tentar excluir a fatura com ID {}: {}", id, e.getMessage(), e);
+            // Lança novamente a exceção para ser tratada ou registrada em outro lugar
+            throw e;
+        }
 	}
 }
