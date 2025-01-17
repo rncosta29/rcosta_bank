@@ -14,7 +14,7 @@ WORKDIR /app
 COPY . /app
 
 # Step 5: Running mvn clean install to compile the project
-RUN mvn clean install -DskipTests
+RUN mvn clean install
 
 # Step 6: Copying the generated JAR file into the container
 COPY target/api-credit.jar api-credit.jar
